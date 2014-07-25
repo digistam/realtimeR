@@ -1,7 +1,6 @@
 CodeBook.md
 ===========
-# author: "Mark Stam"
-
+author: Mark Stam
 
 The dataset, derived from the SQLite database, contains variables:
 
