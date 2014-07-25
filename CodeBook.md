@@ -1,10 +1,7 @@
 CodeBook.md
 ===========
----
-title: "CodeBook.md"
-author: "Mark Stam"
-date: "Friday, July 25, 2014"
----
+# author: "Mark Stam"
+
 
 The dataset, derived from the SQLite database, contains variables:
 
