@@ -2,44 +2,44 @@ CodeBook.md
 ===========
 author: Mark Stam
 
-The dataset, derived from the SQLite database, contains variables:
+The tidy dataset *__DF__*, derived from the SQLite database, contains variables:
 
 'data.frame':  18 variables:
-* id        : int
+* id        : int, 
 _identifier in database_
-* tid       : chr
+* tid       : chr, 
 _identifier of tweet_
-* username  : chr
+* username  : chr, 
 _username of Twitter account_
-* statuses  : chr
+* statuses  : chr, 
 _amount of statuses the user created on Twitter_
-* since     : chr
+* since     : chr, 
 _creation date of Twitter account_
-* followers : int
+* followers : int, 
 _amount of followers of the Twitter account_
-* friends   : int
+* friends   : int, 
 _amount of friends of the Twitter account_
-* location  : chr
+* location  : chr, 
 _location of the Twitter user (user details)_
-* utc_offset: int
+* utc_offset: int, 
 _UTC offset of the Twitter account_
-* created_at: chr
+* created_at: chr, 
 _creation date of the message (tweet)_
-* content   : chr
+* content   : chr, 
 _contents of the message_
-* geo       : chr
+* geo       : chr, 
 _geo coördinates of the message (if available)_
-* meta      : chr
+* meta      : chr, 
 _meta information of the message_
-* hashtags  : chr
+* hashtags  : chr, 
 _hashtags used in the message_
-* urls      : chr
+* urls      : chr, 
 _urls used in the message_
-* media     : chr
+* media     : chr, 
 _media (images, video) used in the message_
-* source    : chr
+* source    : chr, 
 _source of the message (application)_
-* lang      : chr
+* lang      : chr, 
 _language of the message_
 
 
