@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# © 2014, Mark Stam digistam@gmail.com 
+# © 2014, Mark Stam 
 
 CONSUMER_KEY = ''
 CONSUMER_SECRET = ''
