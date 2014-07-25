@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
+# © 2014, Mark Stam 
 
 # twitter client
 import tweepy
