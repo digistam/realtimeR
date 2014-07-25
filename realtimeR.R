@@ -1,6 +1,6 @@
 # realtimeR.R
 # Author: Mark Stam
-#
+# Date: 25-07-2014
 
 connectSQL <- function(x) {
   require("RSQLite")
