@@ -1,7 +1,7 @@
 README.md
 ==========
 
-This information is under construction
+_This information is under construction_
 
 ## Dependencies
 [Tweepy](https://github.com/tweepy/tweepy) is needed in order to run the Python script. Download or fork the Tweepy master branch and copy the _"tweepy"_ subfolder to the realtimeR project folder / working directory.
