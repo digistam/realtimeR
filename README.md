@@ -14,7 +14,7 @@ This information is under construction
 * _OAuth Access Token_
 * _OAuth Access Token Secret_
 
-You should keep these secret, if anybody else gets these keys your Twitter account can be compromised. 
+You should keep these secret, if anybody else gets these keys your Twitter account can be compromised!
 
 ## Variables
 Dataset variables (labels) are explained in [codeBook.md](https://github.com/digistam/realtimeR/blob/master/CodeBook.md).
