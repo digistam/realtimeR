@@ -131,6 +131,8 @@ plot(pos.fit)
 groups <- cutree(pos.fit, k=5) 
 # draw dendogram with red borders around the 5 clusters
 rect.hclust(pos.fit, k=5, border="red")
+## The terms higher in the plot are more popular, and terms close to each other 
+## are more associated 
 
 ## Text mining negative tweets
 neg.tweets.corpus <- Corpus(VectorSource(neg.tweets$content))
