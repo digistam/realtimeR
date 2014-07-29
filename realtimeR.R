@@ -15,10 +15,6 @@ queryTable <- function(x) {
   DF <<- as.data.frame(q)
 }
 
-topUsers <- function(x) {
-  head(sort(table(DF$username),decreasing=T),10)
-}
-
 ##-----------------------------------------------------------------------------------
 ## sentiment analysis
 ## credits: http://www.inside-r.org/howto/mining-twitter-airline-consumer-sentiment
@@ -81,21 +77,6 @@ print(paste('percentage positive tweets: ',nrow(pos.tweets) / sum(nrow(DF)) * 10
 print(paste('percentage negative tweets: ',nrow(neg.tweets) / sum(nrow(DF)) * 100))
 
 ##-----------------------------------------------------------------------------------
-## Geographic analysis
-## credits: 
-##
-## ----------------------------------------------------------------------------------
-
-#splitGeo <- strsplit(DF$geo,",")
-#firstElement <- function(x){x[1]}
-#secondElement <- function(x){x[2]}
-#lat <- sapply(splitGeo,firstElement)
-#lat <- lat[!is.na(lat)]
-#lon <- sapply(splitGeo,secondElement)
-#lon <- lat[!is.na(lon)]
-#geo <- cbind(lat,lon)
-
-##-----------------------------------------------------------------------------------
 ## Text mining
 ## credits: http://heuristically.wordpress.com/2011/04/08/text-data-mining-twitter-r/
 ##
@@ -106,6 +87,7 @@ print(paste('percentage negative tweets: ',nrow(neg.tweets) / sum(nrow(DF)) * 10
 
 install.packages('tm')
 require(tm)
+## Text mining positive tweets
 pos.tweets.corpus <- Corpus(VectorSource(pos.tweets$content))
 pos.tweets.corpus <- tm_map(pos.tweets.corpus, tolower)
 pos.tweets.corpus <- tm_map(pos.tweets.corpus, removePunctuation)
@@ -127,6 +109,7 @@ groups <- cutree(pos.fit, k=5) # cut tree into 5 clusters
 # draw dendogram with red borders around the 5 clusters
 rect.hclust(pos.fit, k=5, border="red")
 
+## Text mining negative tweets
 neg.tweets.corpus <- Corpus(VectorSource(neg.tweets$content))
 neg.tweets.corpus <- tm_map(neg.tweets.corpus, tolower)
 neg.tweets.corpus <- tm_map(neg.tweets.corpus, removePunctuation)
