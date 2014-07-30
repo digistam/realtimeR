@@ -16,6 +16,37 @@ queryTable <- function(x) {
 }
 
 ##-----------------------------------------------------------------------------------
+## reTweet network
+## credits: http://stackoverflow.com/questions/10427147/retweet-count-for-specific-tweet
+##
+## ----------------------------------------------------------------------------------
+install.packages('igraph')
+require(igraph)
+# Clean text of tweets 
+DF$text <- sapply(DF$content,function(row) iconv(row,to='UTF-8')) #remove odd characters
+trim <- function (x) sub('@','',x) # remove @ symbol from user names 
+# Extract retweets
+library(stringr)
+DF$rt <- sapply(DF$text,function(tweet) trim(str_match(tweet,"^RT (@[[:alnum:]_]*)")[2]))      
+# basic analysis and visualisation of RT'd messages
+sum(!is.na(DF$rt))                # see how many tweets are retweets
+sum(!is.na(DF$rt))/length(DF$rt)  # the ratio of retweets to tweets
+countRT <- table(DF$rt)
+countRT <- sort(countRT)
+countRT.subset <- subset(countRT,countRT >2) # subset those RTd at least twice
+barplot(countRT.subset,las=2,cex.names = 0.75) # plot them
+#  basic social network analysis using RT 
+rt <- data.frame(user=DF$username, rt=DF$rt) # tweeter-retweeted pairs
+rt.u <- na.omit(unique(rt)) # omit pairs with NA, get only unique pairs
+# begin sna
+g <- graph.data.frame(rt.u, directed = T)
+ecount(g) # edges (connections)
+vcount(g) # vertices (nodes)
+diameter(g) # network diameter
+farthest.nodes(g) # show the farthest nodes
+tkplot(g)
+
+##-----------------------------------------------------------------------------------
 ## sentiment analysis
 ## credits: http://www.inside-r.org/howto/mining-twitter-airline-consumer-sentiment
 ##
