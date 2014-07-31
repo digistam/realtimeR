@@ -16,12 +16,14 @@ queryTable <- function(x) {
 }
 
 ##-----------------------------------------------------------------------------------
-## reTweet network
+## reTweet network function
 ## credits: http://stackoverflow.com/questions/10427147/retweet-count-for-specific-tweet
 ##
 ## ----------------------------------------------------------------------------------
-install.packages('igraph')
+#install.packages('igraph')
+retweets <- function(y) {
 require(igraph)
+DF <- y
 # Clean text of tweets 
 DF$text <- sapply(DF$content,function(row) iconv(row,to='UTF-8')) #remove odd characters
 trim <- function (x) sub('@','',x) # remove @ symbol from user names 
@@ -45,6 +47,7 @@ vcount(g) # vertices (nodes)
 diameter(g) # network diameter
 farthest.nodes(g) # show the farthest nodes
 tkplot(g)
+}
 
 ##-----------------------------------------------------------------------------------
 ## sentiment analysis
@@ -106,6 +109,8 @@ pos.tweets <- DF[tweet.scores == 4 | tweet.scores == 5,]
 
 print(paste('percentage positive tweets: ',nrow(pos.tweets) / sum(nrow(DF)) * 100))
 print(paste('percentage negative tweets: ',nrow(neg.tweets) / sum(nrow(DF)) * 100))
+retweets(pos.tweets)
+retweets(neg.tweets)
 
 ##-----------------------------------------------------------------------------------
 ## Text mining
@@ -113,77 +118,59 @@ print(paste('percentage negative tweets: ',nrow(neg.tweets) / sum(nrow(DF)) * 10
 ##
 ## ----------------------------------------------------------------------------------
 
-install.packages('tm')
-require(tm)
-## Text mining positive tweets
-pos.tweets.corpus <- Corpus(VectorSource(pos.tweets$content))
-pos.tweets.corpus <- tm_map(pos.tweets.corpus, tolower)
-pos.tweets.corpus <- tm_map(pos.tweets.corpus, removePunctuation)
-pos.tweets.stopwords <- c(stopwords('english'))
-pos.tweets.corpus <- tm_map(pos.tweets.corpus, removeWords, pos.tweets.stopwords)
-pos.tweets.dtm <- TermDocumentMatrix(pos.tweets.corpus)
-pos.tweets.dtm
-## find frequent words
-findFreqTerms(pos.tweets.dtm, lowfreq=30) 
-## In corpus linguistics, a collocation is a sequence of words or terms 
-## that co-occur more often than would be expected by chance. 
-findAssocs(pos.tweets.dtm, 'mh17', 0.20)
-## The number under each word is an association score, so the search term 
-## always occurs with the search term. In some applications, a stemmer or 
-## spell checker could help with misspelled words like “believeing.”
-##
-## To make a Hierarchical Agglomerative cluster plot, we need to reduce 
-## the number of terms (which otherwise wouldn’t fit on a page or the screen) 
-## and build a data frame.
-## remove sparse terms to simplify the cluster plot
-## Note: tweak the sparse parameter to determine the number of words.
-## About 10-30 words is good.
-pos.tweets.dtm2 <- removeSparseTerms(pos.tweets.dtm, sparse=0.95)
-## convert the sparse term-document matrix to a standard data frame
-pos.tweets.df <- as.data.frame(inspect(pos.tweets.dtm2))
-## inspect dimensions of the data frame
-nrow(pos.tweets.df)
-ncol(pos.tweets.df)
-## Now the data frame contains a bag of words (specifically, 1-grams) 
-## which are simple frequency counts. Though the structure is lost, 
-## it retains much information and is simple to use. The data frame 
-## is ready for cluster analysis using a cluster analysis function 
-## available in R core.
-pos.tweets.df.scale <- scale(pos.tweets.df)
-## distance matrix
-pos.d <- dist(pos.tweets.df.scale, method = "euclidean")
-pos.fit <- hclust(pos.d, method="ward")
-plot(pos.fit) 
-## display dendogram
-## A dendrogram (from Greek dendron "tree" and gramma "drawing") is a tree diagram 
-## frequently used to illustrate the arrangement of the clusters produced by hierarchical 
-## clustering. 
-## Cut tree into 5 clusters
-groups <- cutree(pos.fit, k=5) 
-# draw dendogram with red borders around the 5 clusters
-rect.hclust(pos.fit, k=5, border="red")
-## The terms higher in the plot are more popular, and terms close to each other 
-## are more associated 
-
-## Text mining negative tweets
-neg.tweets.corpus <- Corpus(VectorSource(neg.tweets$content))
-neg.tweets.corpus <- tm_map(neg.tweets.corpus, tolower)
-neg.tweets.corpus <- tm_map(neg.tweets.corpus, removePunctuation)
-neg.tweets.stopwords <- c(stopwords('english')) ## add more if needed
-neg.tweets.corpus <- tm_map(neg.tweets.corpus, removeWords, neg.tweets.stopwords)
-neg.tweets.dtm <- TermDocumentMatrix(neg.tweets.corpus)
-neg.tweets.dtm
-findFreqTerms(neg.tweets.dtm, lowfreq=30)
-findAssocs(neg.tweets.dtm, 'mh17', 0.20)
-neg.tweets.dtm2 <- removeSparseTerms(neg.tweets.dtm, sparse=0.95)
-neg.tweets.df <- as.data.frame(inspect(neg.tweets.dtm2))
-nrow(neg.tweets.df)
-ncol(neg.tweets.df)
-neg.tweets.df.scale <- scale(neg.tweets.df)
-neg.d <- dist(neg.tweets.df.scale, method = "euclidean")
-neg.fit <- hclust(neg.d, method="ward")
-plot(neg.fit)
-groups <- cutree(neg.fit, k=5)
-rect.hclust(neg.fit, k=5, border="red")
+#install.packages('tm')
+textmine <- function(y,z) {
+  require(tm)
+  DF <- y
+  ## Text mining positive tweets
+  DF.corpus <- Corpus(VectorSource(DF$content))
+  DF.corpus <- tm_map(DF.corpus, tolower)
+  DF.corpus <- tm_map(DF.corpus, removePunctuation)
+  DF.stopwords <- c(stopwords('english'), stopwords('dutch'))
+  DF.corpus <- tm_map(DF.corpus, removeWords, DF.stopwords)
+  DF.dtm <- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(3,10)))
+  #DF.dtm
+  ## find frequent words
+  findFreqTerms(DF.dtm, lowfreq=30) 
+  ## In corpus linguistics, a collocation is a sequence of words or terms 
+  ## that co-occur more often than would be expected by chance. 
+  findAssocs(DF.dtm, z, 0.20)
+  ## The number under each word is an association score, so the search term 
+  ## always occurs with the search term. In some applications, a stemmer or 
+  ## spell checker could help with misspelled words like “believeing.”
+  ##
+  ## To make a Hierarchical Agglomerative cluster plot, we need to reduce 
+  ## the number of terms (which otherwise wouldn’t fit on a page or the screen) 
+  ## and build a data frame.
+  ## remove sparse terms to simplify the cluster plot
+  ## Note: tweak the sparse parameter to determine the number of words.
+  ## About 10-30 words is good.
+  DF.dtm2 <- removeSparseTerms(DF.dtm, sparse=0.95)
+  ## convert the sparse term-document matrix to a standard data frame
+  DF.df <- as.data.frame(inspect(DF.dtm2))
+  ## inspect dimensions of the data frame
+  ##nrow(DF.df)
+  ##ncol(DF.df)
+  ## Now the data frame contains a bag of words (specifically, 1-grams) 
+  ## which are simple frequency counts. Though the structure is lost, 
+  ## it retains much information and is simple to use. The data frame 
+  ## is ready for cluster analysis using a cluster analysis function 
+  ## available in R core.
+  DF.df.scale <- scale(DF.df)
+  ## distance matrix
+  pos.d <- dist(DF.df.scale, method = "euclidean")
+  pos.fit <- hclust(pos.d, method="ward")
+  plot(pos.fit) 
+  ## display dendogram
+  ## A dendrogram (from Greek dendron "tree" and gramma "drawing") is a tree diagram 
+  ## frequently used to illustrate the arrangement of the clusters produced by hierarchical 
+  ## clustering. 
+  ## Cut tree into 5 clusters
+  groups <- cutree(pos.fit, k=5) 
+  # draw dendogram with red borders around the 5 clusters
+  rect.hclust(pos.fit, k=5, border="red")
+  ## The terms higher in the plot are more popular, and terms close to each other 
+  ## are more associated 
+}
 
 ## To Do: text mining koppelen aan dreigingslijst / loodslijst en hiervan dendrogrammen etc. maken
