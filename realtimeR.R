@@ -121,6 +121,7 @@ retweets(neg.tweets)
 #install.packages('tm')
 textmine <- function(y,z) {
   require(tm)
+  require(wordcloud)
   DF <- y
   ## Text mining positive tweets
   DF.corpus <- Corpus(VectorSource(DF$content))
@@ -171,6 +172,11 @@ textmine <- function(y,z) {
   rect.hclust(pos.fit, k=5, border="red")
   ## The terms higher in the plot are more popular, and terms close to each other 
   ## are more associated 
+  m <- as.matrix(DF.dtm)
+  v <- sort(rowSums(m), decreasing=TRUE)
+  DFnames <- names(v)
+  d <- data.frame(word=DFnames, freq=v)
+  wordcloud(d$word, d$freq, min.freq=3)  
 }
 
 ## To Do: text mining koppelen aan dreigingslijst / loodslijst en hiervan dendrogrammen etc. maken
