@@ -155,3 +155,4 @@ plot(neg.fit)
 groups <- cutree(neg.fit, k=5)
 rect.hclust(neg.fit, k=5, border="red")
 
+## To Do: text mining koppelen aan dreigingslijst / loodslijst en hiervan dendrogrammen etc. maken
