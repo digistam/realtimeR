@@ -27,6 +27,7 @@ After creation of the (large) dataset with the connectSQL() and queryTable() fun
 Now a new dataset, named subDF, is available with all tweets from the large dataset containing the word 'Germany'. You can use the other functions on this subsetted dataset, like:
 
 > textmine(subDF,'Germany')
+>
 > tweet.scores = score.sentiment(subDF$content, pos.words, neg.words, .progress='text')
 
 etc.
