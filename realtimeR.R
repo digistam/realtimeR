@@ -24,6 +24,13 @@ subDF <<- DF[grep(x,DF$content),]
 }
 
 ##-----------------------------------------------------------------------------------
+## Influence
+## Accounts with the most followers
+## ----------------------------------------------------------------------------------
+
+head(paste(DF$username,DF$followers)[rev(order(DF$followers))],n <- 50)
+
+##-----------------------------------------------------------------------------------
 ## Geo locations
 ## ----------------------------------------------------------------------------------
 
@@ -38,6 +45,8 @@ geoLocations <- DF$geo[which(DF$geo > 0)]
 retweets <- function(y) {
 require(igraph)
 DF <- y
+# List the most influential accounts
+print(head(paste(DF$username,DF$followers)[rev(order(DF$followers))],n <- 50))
 # Clean text of tweets 
 DF$text <- sapply(DF$content,function(row) iconv(row,to='UTF-8')) #remove odd characters
 trim <- function (x) sub('@','',x) # remove @ symbol from user names 
@@ -60,7 +69,8 @@ ecount(g) # edges (connections)
 vcount(g) # vertices (nodes)
 diameter(g) # network diameter
 farthest.nodes(g) # show the farthest nodes
-tkplot(g)
+#tkplot(g)
+write.graph(g,'./rtnetwork.graphml',format <- 'graphml')
 }
 
 ##-----------------------------------------------------------------------------------
@@ -144,7 +154,11 @@ textmine <- function(y,z) {
   DF.stopwords <- c(stopwords('english'), stopwords('dutch'))
   DF.corpus <- tm_map(DF.corpus, removeWords, DF.stopwords)
   DF.dtm <- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(3,10)))
-  #DF.dtm
+  ## A document-term matrix or term-document matrix is a mathematical matrix that 
+  ## describes the frequency of terms that occur in a collection of documents. 
+  ## In a document-term matrix, rows correspond to documents in the collection 
+  ## and columns correspond to terms. 
+  DF.dtm
   ## find frequent words
   findFreqTerms(DF.dtm, lowfreq=30) 
   ## In corpus linguistics, a collocation is a sequence of words or terms 
