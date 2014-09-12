@@ -11,23 +11,50 @@ shinyServer(function(input, output, session) {
     connectSQL(inFile$datapath)
     dbtbl <- dbListTables(con)
     updateSelectizeInput(session, 'database_tables', choices = dbtbl)
-    output$values <- renderPrint({
-      input$goButton
-      isolate(input$database_tables)
-    })
     
-    q <- dbGetQuery(con, paste("SELECT * FROM ", dbtbl[2], "", sep=""))
-    DF <<- as.data.frame(q)
-    mn <- tapply(DF$username,INDEX = DF$username,FUN=table)
-    tbl <- as.data.frame(as.table(mn))
-    tbl <- tbl[order(tbl$Freq, decreasing = T),]
-    df <- head(tbl,n=10)
+    ## show text after button click
+    tableListbox <- function() {
+    output$tables <- renderPrint({
+      input$goButton
+      isolate({
+        tableName <<- input$database_tables
+        isolate(cat(tableName))
+      })
+      
+    }) 
+    #output$hh <- renderPrint({
+    #  input$goButton
+    #  isolate(tableName)
+    #}
+  }
+    tableListbox()
+    ##
+    
     output$tweets <- renderDataTable({
       input$goButton
-      isolate(
+      isolate({
+        #q <- dbGetQuery(con, paste("SELECT * FROM ", dbtbl[2], "", sep=""))
+        q <- dbGetQuery(con, paste("SELECT * FROM ", tableName, "", sep=""))
+        DF <<- as.data.frame(q)
+        Recent <<- head(sort(DF$created_at,decreasing=T),n <- 5)
+        mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'(',DF$followers,'followers )'),FUN=table)
+        tbl <- as.data.frame(as.table(mn))
+        names(tbl) <- c('Account','Frequency')
+        tbl <- tbl[order(tbl$Frequency, decreasing = T),]
+        df <- head(tbl,n=100)
         df
-        )
+        })
+    })
+    output$recent <- renderDataTable({
+      input$goButton
+      isolate({
+        as.data.frame(Recent)  
       })
-    
+      })
+    output$histfollow <- renderPlot({
+      input$goButton
+      isolate({
+        hist(DF$followers)})
+    })
     })
 })
