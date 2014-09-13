@@ -19,19 +19,31 @@ shinyUI(navbarPage(
     #p('Dataset'),
     
   fluidRow(
-      dataTableOutput(outputId="tweets")
+      checkboxGroupInput('show_vars', 'Columns in dataframe to show:',
+                         names(DF), selected = names(c(DF[3],DF[10],DF[11])), inline = T),
+      dataTableOutput("tweets"),
+      tags$head(tags$style("tfoot {display: table-header-group;}"))
     ),
   textOutput('tables')
   ),
    
   
-  tabPanel("Meest recent",
-           HTML('<b>UTC tijd (GMT -2)</b>'),
+  #tabPanel("Most recent",
+  #         HTML('<b>UTC tijd (GMT -2)</b>'),
+  #         fluidRow(
+  #           dataTableOutput(outputId="recent"),
+  #           tags$head(tags$style("tfoot {display: table-header-group;}")))),
+  tabPanel("TimeSeries",
            fluidRow(
-             dataTableOutput(outputId="recent"))),
+             plotOutput('timeSeries', heigh=800, width=800))),
+  tabPanel("Influence",
+           HTML('<b>Influence</b>'),
+           fluidRow(
+             dataTableOutput(outputId="influence"),
+             tags$head(tags$style("tfoot {display: table-header-group;}")))),
   tabPanel("Histogram",
     p('Histogram'),
-    plotOutput('histfollow', height=600, width=600)),
+    plotOutput('histfollow', height=800, width=800)),
   tabPanel("Credits",
     p("Mark Stam"))
 ))

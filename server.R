@@ -35,26 +35,46 @@ shinyServer(function(input, output, session) {
       isolate({
         #q <- dbGetQuery(con, paste("SELECT * FROM ", dbtbl[2], "", sep=""))
         q <- dbGetQuery(con, paste("SELECT * FROM ", tableName, "", sep=""))
-        DF <<- as.data.frame(q)
+        DF <<- as.data.frame(q)      
         Recent <<- head(sort(DF$created_at,decreasing=T),n <- 5)
         mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'(',DF$followers,'followers )'),FUN=table)
         tbl <- as.data.frame(as.table(mn))
         names(tbl) <- c('Account','Frequency')
         tbl <- tbl[order(tbl$Frequency, decreasing = T),]
+        tbl <- DF
         df <- head(tbl,n=100)
         df
         })
+      DF[, input$show_vars, drop = FALSE]
     })
-    output$recent <- renderDataTable({
+    output$influence <- renderDataTable({
       input$goButton
       isolate({
-        as.data.frame(Recent)  
+        mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'(',DF$followers,'followers )'),FUN=table)
+        tbl <- as.data.frame(as.table(mn))
+        names(tbl) <- c('Account','Frequency')
+        tbl <- tbl[order(tbl$Frequency, decreasing = T),]
+        #df <- head(tbl,n=100)
+        df <- tbl
       })
-      })
+    })
+    #output$recent <- renderDataTable({
+    #  input$goButton
+    #  isolate({
+    #    as.data.frame(Recent)  
+    #  })
+    #  })
     output$histfollow <- renderPlot({
       input$goButton
       isolate({
         hist(DF$followers)})
     })
+  output$timeSeries <- renderPlot({
+    input$goButton
+    isolate({
+    timeSeries <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S")
+    plot(timeSeries, type="l")
+    })
+  })
     })
 })
