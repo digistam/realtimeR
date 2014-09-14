@@ -22,10 +22,6 @@ shinyServer(function(input, output, session) {
       })
       
     }) 
-    #output$hh <- renderPrint({
-    #  input$goButton
-    #  isolate(tableName)
-    #}
   }
     tableListbox()
     ##
@@ -33,17 +29,22 @@ shinyServer(function(input, output, session) {
     output$tweets <- renderDataTable({
       input$goButton
       isolate({
-        #q <- dbGetQuery(con, paste("SELECT * FROM ", dbtbl[2], "", sep=""))
         q <- dbGetQuery(con, paste("SELECT * FROM ", tableName, "", sep=""))
-        DF <<- as.data.frame(q)      
-        Recent <<- head(sort(DF$created_at,decreasing=T),n <- 5)
-        mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'(',DF$followers,'followers )'),FUN=table)
-        tbl <- as.data.frame(as.table(mn))
-        names(tbl) <- c('Account','Frequency')
-        tbl <- tbl[order(tbl$Frequency, decreasing = T),]
+        DF <<- as.data.frame(q)  
+        
+        #Recent <<- head(sort(DF$created_at,decreasing=T),n <- 5)
+        #mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'(',DF$followers,'followers )'),FUN=table)
+        #tbl <- as.data.frame(as.table(mn))
+        #names(tbl) <- c('Account','Frequency')
+        #tbl <- tbl[order(tbl$Frequency, decreasing = T),]
+        DF$created_at <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S")
         tbl <- DF
-        df <- head(tbl,n=100)
-        df
+        #tbl$created_at <- as.POSIXct(tbl$created_at,format = "%Y-%m-%d %H:%M:%S")
+        #tbl$Time <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S")
+        #df <- tbl[order(as.POSIXct(tbl$created_at,format = "%Y-%m-%d %H:%M:%S"), decreasing = T),]
+        df <- tbl[ order(tbl$created_at , decreasing = TRUE ),]
+        #df <- tbl
+        df#[order(df$created_at)]
         })
       DF[, input$show_vars, drop = FALSE]
     })
@@ -58,12 +59,6 @@ shinyServer(function(input, output, session) {
         df <- tbl
       })
     })
-    #output$recent <- renderDataTable({
-    #  input$goButton
-    #  isolate({
-    #    as.data.frame(Recent)  
-    #  })
-    #  })
     output$histfollow <- renderPlot({
       input$goButton
       isolate({

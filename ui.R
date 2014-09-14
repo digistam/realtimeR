@@ -19,9 +19,26 @@ shinyUI(navbarPage(
     #p('Dataset'),
     
   fluidRow(
-      checkboxGroupInput('show_vars', 'Columns in dataframe to show:',
-                         names(DF), selected = names(c(DF[3],DF[10],DF[11])), inline = T),
-      dataTableOutput("tweets"),
+
+    #conditionalPanel(
+    #  
+    #  if (exists("DF")) {
+    #    condition = "exists(DF)"
+    #    checkboxGroupInput('show_vars', 'Columns in dataframe to show:',
+    #                     names(DF), selected = names(DF)) 
+    #                       #names(c(DF[3],DF[10],DF[11])), inline = T)
+    #  }),
+    DF <- data.frame(replicate(20,sample(0:1,20,rep=TRUE))),
+    #DF=data.frame(matrix(NA, nrow=2, ncol=18)),
+    #DF <- data.frame(matrix(NA, nrow = 2, ncol = 18)),
+    names(DF) <- c("id",         "tid",        "username",   "statuses",   "since",      "followers", 
+    "friends",    "location",   "utc_offset", "created_at","content",    "geo",       
+    "meta",       "hashtags",   "urls",       "media",      "source",     "lang"),    
+    checkboxGroupInput('show_vars', 'Columns in dataframe to show:',
+                       names(DF), selected = names(c(DF[3],DF[10],DF[11])), inline = T),
+      dataTableOutput(
+        
+        "tweets"),
       tags$head(tags$style("tfoot {display: table-header-group;}"))
     ),
   textOutput('tables')
@@ -35,7 +52,7 @@ shinyUI(navbarPage(
   #           tags$head(tags$style("tfoot {display: table-header-group;}")))),
   tabPanel("TimeSeries",
            fluidRow(
-             plotOutput('timeSeries', heigh=800, width=800))),
+             plotOutput('timeSeries', heigh=400, width="100%"))),
   tabPanel("Influence",
            HTML('<b>Influence</b>'),
            fluidRow(
