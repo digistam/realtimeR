@@ -2,6 +2,10 @@ if (!require("shiny")) {
   install.packages("shiny", repos="http://cran.rstudio.com/") 
   library("shiny") 
 }
+if (!require("googleVis")) {
+  install.packages("googleVis", repos="http://cran.rstudio.com/") 
+  library("googleVis") 
+}
 shinyServer(function(input, output, session) {
   observe({
     inFile<-input$dbfile
@@ -18,33 +22,25 @@ shinyServer(function(input, output, session) {
       input$goButton
       isolate({
         tableName <<- input$database_tables
+        output$Time_myKeyword <- renderPrint(tableName)
+        output$Inf_myKeyword <- renderPrint(tableName)
+        output$Hist_myKeyword <- renderPrint(cat(tableName))
         isolate(cat(tableName))
       })
       
     }) 
   }
     tableListbox()
-    ##
-    
+
     output$tweets <- renderDataTable({
       input$goButton
       isolate({
         q <- dbGetQuery(con, paste("SELECT * FROM ", tableName, "", sep=""))
         DF <<- as.data.frame(q)  
-        
-        #Recent <<- head(sort(DF$created_at,decreasing=T),n <- 5)
-        #mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'(',DF$followers,'followers )'),FUN=table)
-        #tbl <- as.data.frame(as.table(mn))
-        #names(tbl) <- c('Account','Frequency')
-        #tbl <- tbl[order(tbl$Frequency, decreasing = T),]
         DF$created_at <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S")
         tbl <- DF
-        #tbl$created_at <- as.POSIXct(tbl$created_at,format = "%Y-%m-%d %H:%M:%S")
-        #tbl$Time <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S")
-        #df <- tbl[order(as.POSIXct(tbl$created_at,format = "%Y-%m-%d %H:%M:%S"), decreasing = T),]
         df <- tbl[ order(tbl$created_at , decreasing = TRUE ),]
-        #df <- tbl
-        df#[order(df$created_at)]
+        df
         })
       DF[, input$show_vars, drop = FALSE]
     })
@@ -55,21 +51,46 @@ shinyServer(function(input, output, session) {
         tbl <- as.data.frame(as.table(mn))
         names(tbl) <- c('Account','Frequency')
         tbl <- tbl[order(tbl$Frequency, decreasing = T),]
-        #df <- head(tbl,n=100)
         df <- tbl
       })
     })
-    output$histfollow <- renderPlot({
+    output$histfollow <- renderGvis({
       input$goButton
       isolate({
-        hist(DF$followers)})
-    })
-  output$timeSeries <- renderPlot({
+        dfFoll <- as.data.frame(DF$followers)
+        ( 
+          gvisHistogram(dfFoll, options=list(
+            title = "Followers Count",
+            legend="{ position: 'none', maxLines: 2 }",
+            colors="['#871B47']",
+            width='100%',
+            chartid="Histogram",
+            fontSize="10"
+            )
+        )
+        )})
+      })
+
+  bias <- input$nodes
+  bias <- bias * 3600
+  output$sliderinfo <- renderText(bias)
+  output$timeSeries <- renderGvis({
     input$goButton
     isolate({
-    timeSeries <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S")
-    plot(timeSeries, type="l")
-    })
+      ttt <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S") 
+      uuu <- Sys.time() - bias
+      vvv <- ttt[ttt > uuu]
+      t2 <- strptime(vvv, format="%Y-%m-%d %H:%M")
+      t2$min <- round(t2$min, -1)
+      ddd <- as.character(t2)
+      eee <- tapply(ddd,INDEX = ddd,FUN=table)
+      fff <- as.data.frame(as.table(eee))
+      names(fff) <- c('Account','Frequency')
+      df <- data.frame(a=fff$Account, tweets=fff$Frequency)
+      gvisLineChart(df, xvar="a", yvar=c("tweets"),options=list(
+        title="Trendline",
+        fontSize = 10))
+    })    
   })
-    })
+})
 })
