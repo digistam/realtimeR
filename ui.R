@@ -2,8 +2,16 @@ if (!require("shiny")) {
   install.packages("shiny", repos="http://cran.rstudio.com/") 
   library("shiny") 
 }
-shinyUI(navbarPage(
+if (!require(devtools)) {
+  install.packages("devtools")
+  devtools::install_github("rstudio/shiny-incubator")
+}
+library(shinyIncubator)
+
+shinyUI(
   
+  navbarPage(
+    
   "realtimeR 0.1", id="nav",
   
   tabPanel("Dataset",
@@ -25,7 +33,7 @@ shinyUI(navbarPage(
     ),
   textOutput('tables')
   ),
-   
+  
   tabPanel("TimeSeries",
            p('dataset: '),
 
@@ -34,7 +42,7 @@ shinyUI(navbarPage(
            fluidRow(
              htmlOutput('timeSeries')),
            p(),
-           sliderInput('nodes', 'select period in hours', 6, min =0, max = 12, step = 1),
+           sliderInput('nodes', 'select period in hours', 12, min =0, max = 48, step = 1),
            verbatimTextOutput('sliderinfo')
            ),
   tabPanel("Influence",
@@ -46,11 +54,52 @@ shinyUI(navbarPage(
              tags$head(tags$style("tfoot {display: table-header-group;}"))),
            textOutput('tables3')
            ),
+  tabPanel("Hashtags",
+           p('dataset: '),
+           #textOutput('Inf_myKeyword'),
+  #         p(),
+           fluidRow(
+             dataTableOutput(outputId="hashtags")
+          )),
+  tabPanel("Words",
+           p('dataset: '),
+           textOutput('Words_myKeyword'),
+           p(),
+           h1('Frequent words'),
+           verbatimTextOutput('freqWords')
+  ),
   tabPanel("Histogram",
            p('dataset: '),
            textOutput('Hist_myKeyword'),
            p(),
-    htmlOutput('histfollow')),
+    htmlOutput('histfollow')
+    ),
+  tabPanel("Networks",
+           fluidRow (
+           #plotOutput('RtGraph')
+             h1('Retweet network'),
+             p('Unique nodes in graph: '),
+             verbatimTextOutput("nodeCount"),
+             p('Unique edges in graph: '),
+             verbatimTextOutput("edgeCount"),
+             p('Graph density: '),
+             verbatimTextOutput("density"),
+             p('Connected components: '),
+             verbatimTextOutput("clusters"),
+             p('Largest diameter: '),
+             verbatimTextOutput("diameter")
+           ),
+           fluidRow (
+             #plotOutput('RtGraph')
+             h1('Mention network'),
+             p('zorg voor mogelijkheid export graphml bestanden')
+           )
+  ),
   tabPanel("Credits",
-    p("Mark Stam"))
+    p("Mark Stam"),
+    # progressInit() must be called somewhere in the UI in order
+    # for the progress UI to actually appear
+    progressInit()
+    )
+  
 ))
