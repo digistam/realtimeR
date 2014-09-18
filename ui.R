@@ -17,7 +17,9 @@ shinyUI(
   tabPanel("Dataset",
            tags$style(type="text/css",
                       ".shiny-output-error {visibility: hidden; }",
-                      ".shiny-output-before {visibility: hidden; }"),
+                      ".shiny-output-before {visibility: hidden; }",
+                      ".jslider { max-width: 600px; }"),
+           p('To Do: woord associaties, dreigingslijst matching, sentiment analyse'),
     fileInput('dbfile', 'load database file:'),
 
     ## div
@@ -42,7 +44,8 @@ shinyUI(
            fluidRow(
              htmlOutput('timeSeries')),
            p(),
-           sliderInput('nodes', 'select period in hours', 12, min =0, max = 48, step = 1),
+           sliderInput('nodes', 'Period in hours', 12, min =0, max = 24, step = 1),
+           checkboxInput("useSlider", "Unlimited period", FALSE),
            verbatimTextOutput('sliderinfo')
            ),
   tabPanel("Influence",
@@ -57,7 +60,7 @@ shinyUI(
   tabPanel("Hashtags",
            p('dataset: '),
            #textOutput('Inf_myKeyword'),
-  #         p(),
+  #        p(),
            fluidRow(
              dataTableOutput(outputId="hashtags")
           )),
@@ -76,7 +79,7 @@ shinyUI(
     ),
   tabPanel("Networks",
            fluidRow (
-           #plotOutput('RtGraph')
+             #plotOutput('RtGraph')
              h1('Retweet network'),
              p('Unique nodes in graph: '),
              verbatimTextOutput("nodeCount"),
@@ -92,7 +95,18 @@ shinyUI(
            fluidRow (
              #plotOutput('RtGraph')
              h1('Mention network'),
-             p('zorg voor mogelijkheid export graphml bestanden')
+             p('Unique nodes in graph: '),
+             verbatimTextOutput("m_nodeCount"),
+             p('Unique edges in graph: '),
+             verbatimTextOutput("m_edgeCount"),
+             p('Graph density: '),
+             verbatimTextOutput("m_density"),
+             p('Connected components: '),
+             verbatimTextOutput("m_clusters"),
+             p('Largest diameter: '),
+             verbatimTextOutput("m_diameter"),
+             p('zorg voor mogelijkheid export graphml bestanden'),
+             p('case studies: http://www.danah.org/papers/TweetTweetRetweet.pdf, http://truthy.indiana.edu/site_media/pdfs/conover_icwsm2011_polarization.pdf, http://journalistsresource.org/studies/politics/campaign-media/us-government-twitter-research')
            )
   ),
   tabPanel("Credits",

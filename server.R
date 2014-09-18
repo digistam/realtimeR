@@ -17,6 +17,11 @@ if (!require("tm")) {
   install.packages("tm", repos="http://cran.rstudio.com/") 
   library("tm") 
 }
+library(lubridate)
+if (!require("lubridate")) {
+  install.packages("lubridate", repos="http://cran.rstudio.com/") 
+  library("lubridate") 
+}
 shinyServer(function(input, output, session) {
   observe({
     inFile<-input$dbfile
@@ -48,9 +53,12 @@ shinyServer(function(input, output, session) {
     output$tweets <- renderDataTable({
       input$goButton
       isolate({
-        q <- dbGetQuery(con, paste("SELECT * FROM ", tableName, "", sep=""))
-        DF <- as.data.frame(q)
-        DF <<- DF[order(DF$created_at, decreasing = TRUE),]
+        q <- dbGetQuery(con, paste("SELECT * FROM ", tableName, " ORDER BY created_at DESC", sep=""))
+        DF <- as.data.frame.matrix(q)
+        DF$created_at <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
+        DF$created_at <- with_tz(DF$created_at, "Europe/Paris")
+        #DF$created_at <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S", tz = "GMT")
+        DF <<- DF
         DF
         })
       
@@ -117,8 +125,10 @@ shinyServer(function(input, output, session) {
         )})
       })})
 
+  if (input$useSlider != TRUE) {
   bias <- input$nodes
   bias <- bias * 3600
+  } else { bias <- 3600000000000000000}
   output$sliderinfo <- renderText(bias)
   output$timeSeries <- renderGvis({
     input$goButton
@@ -130,7 +140,7 @@ shinyServer(function(input, output, session) {
         Sys.sleep(1)
         setProgress(detail = "Still working...")
       
-      ttt <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S") 
+      ttt <- DF$created_at #as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S CEST") 
       uuu <- Sys.time() - bias
       vvv <- ttt[ttt > uuu]
       t2 <- strptime(vvv, format="%Y-%m-%d %H:%M")
@@ -143,9 +153,12 @@ shinyServer(function(input, output, session) {
       Sys.sleep(1)
       setProgress(detail = "Almost there...")
       Sys.sleep(1)
+      setProgress(detail = "Creating timeline ...")
+      Sys.sleep(1)
       gvisLineChart(df, xvar="a", yvar=c("tweets"),options=list(
         title="Trendline",
         fontSize = 10))
+      
     })   }) 
   })
   
@@ -165,15 +178,36 @@ shinyServer(function(input, output, session) {
       })})
   })
   
-    output$nodeCount <- renderText({
+  output$nodeCount <- renderText({
       input$goButton
       isolate({
-      retweets(DF,input$edges)
-      vcount(ng)})})
-  output$edgeCount <- renderText({ecount(ng)})
-  output$density <- renderText({graph.density(ng)})
-  output$diameter <- renderText({diameter(ng)})
-  output$clusters <- renderText({clusters(ng)$no})
+        withProgress(session, {
+          setProgress(message = "Calculating, please wait", detail = "This may take a few moments...")
+          Sys.sleep(1)
+          retweets(DF,input$edges)
+          setProgress(detail = "Still working...")
+          output$nodeCount <- renderText({vcount(ng)})
+          Sys.sleep(1)
+          setProgress(detail = "Almost finished ...")
+          Sys.sleep(1)
+          output$edgeCount <- renderText({ecount(ng)})
+          output$density <- renderText({graph.density(ng)})
+          output$diameter <- renderText({diameter(ng)})
+          output$clusters <- renderText({clusters(ng)$no})
+      })
+        })
+      
+  ## mention network
+  output$m_nodeCount <- renderText({
+    input$goButton
+    isolate({
+      m_retweets(DF,input$edges)
+      vcount(m_ng)})})
+  output$m_edgeCount <- renderText({ecount(m_ng)})
+  output$m_density <- renderText({graph.density(m_ng)})
+  output$m_diameter <- renderText({diameter(m_ng)})
+  output$m_clusters <- renderText({clusters(m_ng)$no})
+  })
   
   ## Frequent words ##
   output$freqWords <- renderText({
