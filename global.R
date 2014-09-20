@@ -10,16 +10,26 @@ if (!require("stringr")) {
   install.packages("stringr", repos="http://cran.rstudio.com/") 
   library("stringr") 
 }
+if (!require("plyr")) {
+  install.packages("plyr", repos="http://cran.rstudio.com/") 
+  library("plyr") 
+}
 if (!require("tm")) {
   install.packages("tm", repos="http://cran.rstudio.com/") 
   library("tm") 
 }
+if (!require("wordcloud")) {
+  install.packages("wordcloud", repos="http://cran.rstudio.com/") 
+  library("wordcloud") 
+}
+
 DF <- data.frame(replicate(18,sample(0:1,20,rep=TRUE)))
 names(DF) <- c("id",         "tid",        "username",   "statuses",   "since",      "followers", 
                "friends",    "location",   "utc_offset", "created_at","content",    "geo",       
                "meta",       "hashtags",   "urls",       "media",      "source",     "lang")  
 DF <- DF[ order(-rank(DF[10])), ]
-
+#tempTt = scan('www/temp.txt',what='character', comment.char=';')
+words = c('temp')
 connectSQL <- function(x) {
   set.seed(111)
   drv <<- dbDriver("SQLite")
@@ -119,3 +129,71 @@ m_retweets <- function(y,z) {
 #  names(ht) <- c('hashtag','frequency')
   #plot(ht)
 #}
+textMine <- function(x) {
+  DF.corpus <- Corpus(VectorSource(x))
+  DF.corpus <- tm_map(DF.corpus, removePunctuation)
+  DF.stopwords <- c(stopwords('english'), stopwords('dutch'))
+  DF.corpus <- tm_map(DF.corpus, removeWords, DF.stopwords)
+  DF.dtm <<- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(3,10)))
+}
+wordCloud <- function(x,y,z) {
+  m <- as.matrix(x)
+  v <- sort(rowSums(m), decreasing=TRUE)
+  DFnames <- names(v)
+  d <- data.frame(word=DFnames, freq=v)
+  wordcloud_rep <- repeatable(wordcloud)
+  #png("www/wordcloud.png", width=1280,height=800,res=300)
+  #wordcloud_rep(d$word, d$freq, min.freq = y, max.words=z, colors=brewer.pal(8, "Dark2")) 
+  wordcloud(d$word,d$freq, scale=c(3.5,1.5),min.freq = y, max.words=z, random.order=T, rot.per=.15, colors=brewer.pal(8, "Dark2"))
+  #dev.off()
+}
+score.threats <- function(sentences, threat.words, .progress='none')
+{
+  require(plyr)
+  require(stringr)
+  
+  # we got a vector of sentences. plyr will handle a list
+  # or a vector as an "l" for us
+  # we want a simple array of scores back, so we use
+  # "l" + "a" + "ply" = "laply":
+  scores = laply(sentences, function(sentence, threat.words) {
+    
+    # clean up sentences with R's regex-driven global substitute, gsub():
+    sentence = gsub('[[:punct:]]', '', sentence)
+    sentence = gsub('[[:cntrl:]]', '', sentence)
+    sentence = gsub('\\d+', '', sentence)
+    # and convert to lower case:
+    sentence = tolower(sentence)
+    
+    # split into words. str_split is in the stringr package
+    word.list = str_split(sentence, '\\s+')
+    # sometimes a list() is one level of hierarchy too much
+    words = unlist(word.list)
+    
+    # compare our words to the dictionaries of positive & negative terms
+    matches = match(words, threat.words)
+    
+    # match() returns the position of the matched term or NA
+    # we just want a TRUE/FALSE:
+    matches = !is.na(matches)
+    
+    # and conveniently enough, TRUE/FALSE will be treated as 1/0 by sum():
+    score = sum(matches)
+    
+    return(score)
+  }, words, .progress=.progress )
+  
+  scores.df = data.frame(score=scores, text=sentences)
+  return(scores.df)
+}
+
+#tt = scan('www/dreigingslijst.txt',what='character', comment.char=';')
+#words = c(tt)
+#tweet.scores = score.threats('pistool en politie', words, .progress='text')
+#dd <- as.data.frame(DF$content[tweet.scores == 2])
+#print(paste('percentage positive tweets: ',nrow(dd) / sum(nrow(DF)) * 100))
+showScores <- function(x) {
+      tt = scan(x,what='character', comment.char=';')
+      words = c(tt)
+      tweet.scores = score.threats(DF$content, words, .progress='text')
+}
