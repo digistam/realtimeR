@@ -33,6 +33,7 @@ shinyServer(function(input, output, session) {
     updateSelectizeInput(session, 'database_tables', choices = dbtbl)
     
     
+    
     ## show text after button click
     tableListbox <- function() {
       output$tables <- renderPrint({
@@ -244,6 +245,7 @@ shinyServer(function(input, output, session) {
     output$threats <- renderDataTable({
       
       sliderscore <- input$threat_scores
+      
       input$threatButton
       isolate({
         withProgress(session, {
@@ -263,10 +265,16 @@ shinyServer(function(input, output, session) {
           tweet.scores <<- score.threats(DF$content, words, .progress='text')
           setProgress(detail = "Generating output ...")
           Sys.sleep(1)
-          dd <- as.data.frame(paste(DF$content,'|',DF$username,'|',DF$created_at)[tweet.scores == sliderscore])
+          #dd <- as.data.frame(paste(DF$content,'|',DF$username,'|',DF$created_at)[tweet.scores == sliderscore])
+          #dd <- as.data.frame(cbind(DF$content[tweet.scores == sliderscore],DF$username[tweet.scores == sliderscore],DF$created_at[tweet.scores == sliderscore]))
+          #names(dd) <- 'Hits'
+          #dd
+          dd <<- DF[tweet.scores == sliderscore,]
           dd
+          
           })
         })
+        dd[, input$show_threatvars, drop = FALSE]
     })
     
   })
