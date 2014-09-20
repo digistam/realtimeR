@@ -28,10 +28,6 @@ shinyServer(function(input, output, session) {
     print(inFile)
     if(is.null(inFile))
       return(NULL)
-    threatFile<-input$threatFile
-    print(threatFile)
-    #if(is.null(threatFile))
-    #  return(NULL)
     connectSQL(inFile$datapath)
     dbtbl <- dbListTables(con)
     updateSelectizeInput(session, 'database_tables', choices = dbtbl)
@@ -248,19 +244,23 @@ shinyServer(function(input, output, session) {
     output$threats <- renderDataTable({
       
       sliderscore <- input$threat_scores
-      input$goButton
+      input$threatButton
       isolate({
         withProgress(session, {
+          
+          threatFile<-input$threatFile
+          print(threatFile)
+          if(is.null(threatFile))
+            return(NULL)
           setProgress(message = "Calculating, please wait",
                       detail = "This may take a few moments...")
           Sys.sleep(1)
           #showScores('www//dreigingslijst.txt')
           ##
-          print(threatFile)
-          tt <- scan('www/dreigingslijst.txt',what='character', comment.char=';')
-          #tt = scan(threatFile,what='character', comment.char=';')
+          #tt <- scan('www/dreigingslijst.txt',what='character', comment.char=';')
+          tt = scan(threatFile$datapath,what='character', comment.char=';')
           words <<- c(tt)
-          tweet.scores = score.threats(DF$content, words, .progress='text')
+          tweet.scores <<- score.threats(DF$content, words, .progress='text')
           setProgress(detail = "Generating output ...")
           Sys.sleep(1)
           dd <- as.data.frame(paste(DF$content,'|',DF$username,'|',DF$created_at)[tweet.scores == sliderscore])

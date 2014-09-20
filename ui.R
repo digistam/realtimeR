@@ -21,7 +21,7 @@ shinyUI(
                         ".jslider { max-width: 600px; }"),
              p('To Do: woord associaties, dreigingslijst matching, sentiment analyse'),
              fileInput('dbfile', 'load database file:'),
-             fileInput('threatFile', 'Select textfile', accept=c('text/csv')),
+             #fileInput('threatFile', 'Select textfile', accept=c('text/ascii')),
 
              ## div
              selectizeInput('database_tables', 'select dataset:', choices = NULL),
@@ -111,6 +111,8 @@ shinyUI(
              )
     ),
     tabPanel("Test",
+             fileInput('threatFile', 'Select textfile', accept=c('text/ascii')),
+             actionButton("threatButton", "Go!"),
              fluidRow (
                h1('Threat scores'),
                sliderInput('threat_scores', 'Dreigingsscore', 1, min = 0, max = 5, step = 1),
