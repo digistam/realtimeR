@@ -32,8 +32,6 @@ shinyServer(function(input, output, session) {
     dbtbl <- dbListTables(con)
     updateSelectizeInput(session, 'database_tables', choices = dbtbl)
     
-    
-    
     ## show text after button click
     tableListbox <- function() {
       output$tables <- renderPrint({
@@ -46,8 +44,7 @@ shinyServer(function(input, output, session) {
           output$Rt_myKeyword <- renderPrint(cat(tableName))
           output$Words_myKeyword <- renderPrint(cat(tableName))
           isolate(cat(tableName))
-        })
-        
+        })        
       }) 
     }
     tableListbox()
@@ -59,7 +56,6 @@ shinyServer(function(input, output, session) {
         DF <- as.data.frame.matrix(q)
         DF$created_at <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
         DF$created_at <- with_tz(DF$created_at, "Europe/Paris")
-        #DF$created_at <- as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S", tz = "GMT")
         DF$followers <- as.numeric(DF$followers)
         DF <<- DF
         DF
@@ -77,10 +73,6 @@ shinyServer(function(input, output, session) {
                       detail = "This may take a few moments...")
           Sys.sleep(1)
           setProgress(detail = "Still working...")
-#           mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'(',DF$followers,'followers )'),FUN=table)
-#           tbl <- as.data.frame(as.table(mn))
-#           names(tbl) <- c('Account','Frequency')
-#           tbl <- tbl[order(tbl$Frequency, decreasing = T),]
           mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'|',DF$followers),FUN=table)
           tbl <- as.data.frame(as.table(mn))
           names(tbl) <- c('name','freq')
@@ -241,40 +233,29 @@ shinyServer(function(input, output, session) {
         })})
     })
     
-    
+    threatFile<-input$threatFile
+    print(threatFile)
+    if(is.null(threatFile))
+      return(NULL)
+    withProgress(session, {
+      setProgress(message = "Calculating, please wait",
+                  detail = "This may take a few moments...")
+      Sys.sleep(1)
+        showScores(threatFile$datapath) 
+      })
+  sliderValues <- reactive({
+    dd <<- DF[score == input$threat_scores,]
+  })
     output$threats <- renderDataTable({
-      
-      sliderscore <- input$threat_scores
-      
-      input$threatButton
-      isolate({
         withProgress(session, {
-          
-          threatFile<-input$threatFile
-          print(threatFile)
-          if(is.null(threatFile))
-            return(NULL)
-          setProgress(message = "Calculating, please wait",
-                      detail = "This may take a few moments...")
-          Sys.sleep(1)
-          #showScores('www//dreigingslijst.txt')
-          ##
-          #tt <- scan('www/dreigingslijst.txt',what='character', comment.char=';')
-          tt = scan(threatFile$datapath,what='character', comment.char=';')
-          words <<- c(tt)
-          tweet.scores <<- score.threats(DF$content, words, .progress='text')
-          setProgress(detail = "Generating output ...")
-          Sys.sleep(1)
-          #dd <- as.data.frame(paste(DF$content,'|',DF$username,'|',DF$created_at)[tweet.scores == sliderscore])
-          #dd <- as.data.frame(cbind(DF$content[tweet.scores == sliderscore],DF$username[tweet.scores == sliderscore],DF$created_at[tweet.scores == sliderscore]))
-          #names(dd) <- 'Hits'
-          #dd
-          dd <<- DF[tweet.scores == sliderscore,]
+           setProgress(message = "Calculating, please wait",
+                       detail = "This may take a few moments...")
+           Sys.sleep(1)
+
+          sliderValues()
           dd
-          
-          })
-        })
-        dd[, input$show_threatvars, drop = FALSE]
+    })
+      dd[, input$show_threatvars, drop = FALSE]
     })
     
   })

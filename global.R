@@ -127,7 +127,7 @@ m_retweets <- function(y,z) {
 #  ht <- tapply(ht,INDEX = ht,FUN=table)
 #  ht <<- as.data.frame(as.table(ht))
 #  names(ht) <- c('hashtag','frequency')
-  #plot(ht)
+#plot(ht)
 #}
 textMine <- function(x) {
   DF.corpus <- Corpus(VectorSource(x))
@@ -187,13 +187,10 @@ score.threats <- function(sentences, threat.words, .progress='none')
   return(scores.df)
 }
 
-#tt = scan('www/dreigingslijst.txt',what='character', comment.char=';')
-#words = c(tt)
-#tweet.scores = score.threats('pistool en politie', words, .progress='text')
-#dd <- as.data.frame(DF$content[tweet.scores == 2])
-#print(paste('percentage positive tweets: ',nrow(dd) / sum(nrow(DF)) * 100))
 showScores <- function(x) {
-      tt = scan(x,what='character', comment.char=';')
-      words = c(tt)
-      tweet.scores = score.threats(DF$content, words, .progress='text')
+  tt = scan(x,what='character', comment.char=';')
+  words <<- c(tt)
+  tweet.scores <- score.threats(DF$content, words, .progress='text')
+  score <<- tweet.scores$score
+  dd <<- cbind(score,DF)
 }

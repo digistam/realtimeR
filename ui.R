@@ -19,7 +19,7 @@ shinyUI(
                         ".shiny-output-error {visibility: hidden; }",
                         ".shiny-output-before {visibility: hidden; }",
                         ".jslider { max-width: 600px; }"),
-             p('To Do: woord associaties, dreigingslijst matching, sentiment analyse'),
+             p('To Do: woord associaties, sentiment analyse, graphml export, excel export'),
              fileInput('dbfile', 'load database file:'),
              #fileInput('threatFile', 'Select textfile', accept=c('text/ascii')),
 
@@ -112,7 +112,7 @@ shinyUI(
     ),
     tabPanel("Test",
              fileInput('threatFile', 'Select textfile', accept=c('text/ascii')),
-             actionButton("threatButton", "Go!"),
+             #actionButton("threatButton", "Go!"),
              fluidRow (
                h1('Threat scores'),
                checkboxGroupInput('show_threatvars', '',
