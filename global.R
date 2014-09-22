@@ -134,7 +134,7 @@ textMine <- function(x) {
   DF.corpus <- tm_map(DF.corpus, removePunctuation)
   DF.stopwords <- c(stopwords('english'), stopwords('dutch'))
   DF.corpus <- tm_map(DF.corpus, removeWords, DF.stopwords)
-  DF.dtm <<- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(3,10)))
+  DF.dtm <<- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(2,10)))
 }
 wordCloud <- function(x,y,z) {
   m <- as.matrix(x)
@@ -147,7 +147,7 @@ wordCloud <- function(x,y,z) {
   wordcloud(d$word,d$freq, scale=c(3.5,1.5),min.freq = y, max.words=z, random.order=T, rot.per=.15, colors=brewer.pal(8, "Dark2"))
   #dev.off()
 }
-score.threats <- function(sentences, threat.words, .progress='none')
+score.threats <- function(sentences, threat.pluswords, threat.minwords, .progress='none')
 {
   require(plyr)
   require(stringr)
@@ -156,7 +156,7 @@ score.threats <- function(sentences, threat.words, .progress='none')
   # or a vector as an "l" for us
   # we want a simple array of scores back, so we use
   # "l" + "a" + "ply" = "laply":
-  scores = laply(sentences, function(sentence, threat.words) {
+  scores = laply(sentences, function(sentence, threat.pluswords, threat.minwords) {
     
     # clean up sentences with R's regex-driven global substitute, gsub():
     sentence = gsub('[[:punct:]]', '', sentence)
@@ -171,26 +171,33 @@ score.threats <- function(sentences, threat.words, .progress='none')
     words = unlist(word.list)
     
     # compare our words to the dictionaries of positive & negative terms
-    matches = match(words, threat.words)
-    
+    plusmatches = match(words, threat.pluswords)
+    minmatches = match(words, threat.minwords)
     # match() returns the position of the matched term or NA
     # we just want a TRUE/FALSE:
-    matches = !is.na(matches)
-    
+    plusmatches = !is.na(plusmatches)
+    minmatches = !is.na(minmatches)
     # and conveniently enough, TRUE/FALSE will be treated as 1/0 by sum():
-    score = sum(matches)
+    score = sum(plusmatches) - sum(minmatches)
     
     return(score)
-  }, words, .progress=.progress )
+  }, threat.pluswords, threat.minwords, .progress=.progress )
   
   scores.df = data.frame(score=scores, text=sentences)
   return(scores.df)
 }
 
-showScores <- function(x) {
-  tt = scan(x,what='character', comment.char=';')
-  words <<- c(tt)
-  tweet.scores <- score.threats(DF$content, words, .progress='text')
+showScores <- function(x,y) {
+  plus = scan(x,what='character', comment.char=';')
+  pluswords <- c(plus)
+  min = scan(y,what='character', comment.char=';')
+  minwords <- c(min) 
+  tweet.scores <- score.threats(DF$content, pluswords, minwords, .progress='text')
   score <<- tweet.scores$score
   dd <<- cbind(score,DF)
+}
+roundTimes <- function() {
+  print('roundTimes wordt uitgevoerd')
+  t2 <<- strptime(DF$created_at, format="%Y-%m-%d %H:%M:%s")
+  t2$min <<- round(t2$min, -1)
 }

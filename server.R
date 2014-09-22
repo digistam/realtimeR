@@ -60,9 +60,8 @@ shinyServer(function(input, output, session) {
         DF <<- DF
         DF
       })
-      
+      rm(list = c("t2"))
       DF[, input$show_vars, drop = FALSE]
-      
     })
     
     output$influence <- renderDataTable({
@@ -127,43 +126,60 @@ shinyServer(function(input, output, session) {
             )
           )})
       })})
+
     
-    if (input$useSlider != TRUE) {
-      bias <- input$nodes
-      bias <- bias * 3600
-    } else { bias <- 3600000000000000000}
-    output$sliderinfo <- renderText(bias)
-    output$timeSeries <- renderGvis({
-      input$goButton
-      isolate({
-        # Wrap the entire expensive operation with withProgress
-        withProgress(session, {
-          setProgress(message = "Calculating, please wait",
-                      detail = "This may take a few moments...")
-          Sys.sleep(1)
-          setProgress(detail = "Still working...")
-          
-          ttt <- DF$created_at #as.POSIXct(DF$created_at,format = "%Y-%m-%d %H:%M:%S CEST") 
-          uuu <- Sys.time() - bias
-          vvv <- ttt[ttt > uuu]
-          t2 <- strptime(vvv, format="%Y-%m-%d %H:%M")
-          t2$min <- round(t2$min, -1)
-          ddd <- as.character(t2)
-          eee <- tapply(ddd,INDEX = ddd,FUN=table)
-          fff <- as.data.frame(as.table(eee))
-          names(fff) <- c('Account','Frequency')
-          df <- data.frame(a=fff$Account, tweets=fff$Frequency)
-          Sys.sleep(1)
-          setProgress(detail = "Almost there...")
-          Sys.sleep(1)
-          setProgress(detail = "Creating timeline ...")
-          Sys.sleep(1)
-          gvisLineChart(df, xvar="a", yvar=c("tweets"),options=list(
-            title="Trendline",
-            fontSize = 10))
-          
-        })   }) 
+    ### alle gevonden created_at tijden eenmaling rounden en daar een dataset van opbouwen
+    ### vervolgens kan uit deze dataset geput worden voor de tijdlijn, hierdoor snel resultaat
+    ### in plaats van telkens opnieuw berekenen
+    ###
+    ### t2 <- strptime(DF$created_at, format="%Y-%m-%d %H:%M")
+    ### t2$min <- round(t2$min, -1)
+    ### resultaat: t2 is een dataset met alle afgeronde tijden uit DF$created_at
+    ### deze moet worden vergeleken met de slider offset:
+    ### now <- strptime(Sys.time(),format="%Y-%m-%d %H:%M")
+    ### now$min <- round(now$min,-1)
+    ### bias <- input$timeSlider
+    ### offset <- now - bias
+    ### t2[offset] geeft als resultaat het aantal tweets binnen de gezochte tijdspanne
+    ### t2table <- as.data.frame(as.table((tapply(as.character(t2[offset]),INDEX = as.character(t2[offset]),FUN=table))))
+    ### names(t2table) <- c('Times','Frequency')
+    
+
+    #roundTimes()
+    
+    sliderTimeValues <- reactive({
+      now <- strptime(Sys.time(),format="%Y-%m-%d %H:%M")
+      now$min <- round(now$min,-1)
+      bias <- input$timeSlider * 3600
+      offset <- now - bias
+      t2table <<- as.data.frame(as.table((tapply(as.character(t2[t2 > offset]),INDEX = as.character(t2[t2 > offset]),FUN=table))))
+      names(t2table) <- c('Times','Frequency')
+      timeLine <- data.frame(a=t2table$Times, tweets=t2table$Frequency)
+      timeLine <<- timeLine
     })
+    output$timeSeries <- renderGvis({
+      if(!exists("t2")) {
+      roundTimes()
+      }
+      if (input$useSlider != TRUE) {
+        sliderTimeValues()
+        } else { 
+          t2table <- as.data.frame(as.table((tapply(as.character(t2),INDEX = as.character(t2),FUN=table))))
+          names(t2table) <- c('Times','Frequency')
+          timeLine <- data.frame(a=t2table$Times, tweets=t2table$Frequency)
+        }
+      gvisLineChart(timeLine, xvar="a", yvar=c("tweets"),options=list(
+        title="Trendline",
+        fontSize = 10))
+    })
+
+output$threatHist <- renderPlot({
+  
+  ##
+  set.seed(123)
+  barplot(table(score))
+  
+})
     
     ## retweet network
     retweets(DF,input$edges) ## function from global
@@ -226,7 +242,7 @@ shinyServer(function(input, output, session) {
           DF.corpus <- tm_map(DF.corpus, removePunctuation)
           DF.stopwords <- c(stopwords('english'), stopwords('dutch'))
           DF.corpus <- tm_map(DF.corpus, removeWords, DF.stopwords)
-          DF.dtm <- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(3,10)))
+          DF.dtm <- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(2,10)))
           freqTerms <- findFreqTerms(DF.dtm, lowfreq=10) 
           setProgress(detail = "Almost there...")
           freqTerms #<- as.data.frame(freqTerms)
@@ -241,9 +257,9 @@ shinyServer(function(input, output, session) {
       setProgress(message = "Calculating, please wait",
                   detail = "This may take a few moments...")
       Sys.sleep(1)
-        showScores(threatFile$datapath) 
+        showScores(threatFile$datapath,'www/minwords.txt') 
       })
-  sliderValues <- reactive({
+  sliderThreatValues <- reactive({
     dd <<- DF[score == input$threat_scores,]
   })
     output$threats <- renderDataTable({
@@ -252,7 +268,7 @@ shinyServer(function(input, output, session) {
                        detail = "This may take a few moments...")
            Sys.sleep(1)
 
-          sliderValues()
+          sliderThreatValues()
           dd
     })
       dd[, input$show_threatvars, drop = FALSE]

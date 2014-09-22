@@ -38,6 +38,7 @@ shinyUI(
     ),
     
     tabPanel("TimeSeries",
+             
              p('dataset: '),
              
              textOutput('Time_myKeyword'),
@@ -45,7 +46,7 @@ shinyUI(
              fluidRow(
                htmlOutput('timeSeries')),
              p(),
-             sliderInput('nodes', 'Period in hours', 12, min =0, max = 24, step = 1),
+             sliderInput('timeSlider', 'Period in hours', 12, min =1, max = 24, step = 1),
              checkboxInput("useSlider", "Unlimited period", FALSE),
              verbatimTextOutput('sliderinfo')
     ),
@@ -113,16 +114,19 @@ shinyUI(
     tabPanel("Test",
              fileInput('threatFile', 'Select textfile', accept=c('text/ascii')),
              #actionButton("threatButton", "Go!"),
+             
              fluidRow (
                h1('Threat scores'),
                checkboxGroupInput('show_threatvars', '',
                                   names(DF), selected = names(c(DF[3],DF[10],DF[11])), inline = T),
-               sliderInput('threat_scores', 'Dreigingsscore', 1, min = 0, max = 5, step = 1),
-               dataTableOutput(outputId="threats")
+               sliderInput('threat_scores', 'Dreigingsscore', 1, min = -5, max = 5, step = 1),
+               dataTableOutput(outputId="threats"),
+               plotOutput('threatHist')
                )
              ),
     tabPanel("Credits",
              p("Mark Stam"),
+             HTML("<a target=_blank href=https://github.com/digistam/realtimeR>GitHub</a>"),
              # progressInit() must be called somewhere in the UI in order
              # for the progress UI to actually appear
              progressInit()
