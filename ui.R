@@ -80,36 +80,50 @@ shinyUI(
              htmlOutput('histfollow')
     ),
     tabPanel("Networks",
-             fluidRow (
-               #plotOutput('RtGraph')
-               h1('Retweet network'),
-               p('Unique nodes in graph: '),
-               verbatimTextOutput("nodeCount"),
-               p('Unique edges in graph: '),
-               verbatimTextOutput("edgeCount"),
-               p('Graph density: '),
-               verbatimTextOutput("density"),
-               p('Connected components: '),
-               verbatimTextOutput("clusters"),
-               p('Largest diameter: '),
-               verbatimTextOutput("diameter")
+             sidebarPanel(
+               selectInput("downloadGraphs", "Choose a Graph dataset:", 
+                           choices = c("retweet network", "mention network")),
+               downloadButton('downloadData', 'Download')
              ),
-             fluidRow (
-               #plotOutput('RtGraph')
-               h1('Mention network'),
-               p('Unique nodes in graph: '),
-               verbatimTextOutput("m_nodeCount"),
-               p('Unique edges in graph: '),
-               verbatimTextOutput("m_edgeCount"),
-               p('Graph density: '),
-               verbatimTextOutput("m_density"),
-               p('Connected components: '),
-               verbatimTextOutput("m_clusters"),
-               p('Largest diameter: '),
-               verbatimTextOutput("m_diameter"),
-               p('zorg voor mogelijkheid export graphml bestanden'),
-               p('case studies: http://www.danah.org/papers/TweetTweetRetweet.pdf, http://truthy.indiana.edu/site_media/pdfs/conover_icwsm2011_polarization.pdf, http://journalistsresource.org/studies/politics/campaign-media/us-government-twitter-research')
+             mainPanel(
+               fluidRow (
+                 #plotOutput('RtGraph')
+                 h1('Retweet network'),
+                 p('Unique nodes in graph: '),
+                 verbatimTextOutput("nodeCount"),
+                 p('Unique edges in graph: '),
+                 verbatimTextOutput("edgeCount"),
+                 p('Graph density: '),
+                 verbatimTextOutput("density"),
+                 p('Connected components: '),
+                 verbatimTextOutput("clusters"),
+                 p('Clustering coefficient'),
+                 verbatimTextOutput("clustercoeff"),
+                 p('Largest diameter: '),
+                 verbatimTextOutput("diameter")#,
+                 #p('Degree distribution'),
+                 #plotOutput("ng_hist")
+               ),
+               fluidRow (
+                 #plotOutput('RtGraph')
+                 h1('Mention network'),
+                 p('Unique nodes in graph: '),
+                 verbatimTextOutput("m_nodeCount"),
+                 p('Unique edges in graph: '),
+                 verbatimTextOutput("m_edgeCount"),
+                 p('Graph density: '),
+                 verbatimTextOutput("m_density"),
+                 p('Connected components: '),
+                 verbatimTextOutput("m_clusters"),
+                 p('Clustering coefficient'),
+                 verbatimTextOutput("m_clustercoeff"),
+                 p('Largest diameter: '),
+                 verbatimTextOutput("m_diameter"),
+                 p('zorg voor mogelijkheid export graphml bestanden'),
+                 p('case studies: http://www.danah.org/papers/TweetTweetRetweet.pdf, http://truthy.indiana.edu/site_media/pdfs/conover_icwsm2011_polarization.pdf, http://journalistsresource.org/studies/politics/campaign-media/us-government-twitter-research')
+               )
              )
+
     ),
     tabPanel("Test",
              fileInput('threatFile', 'Select textfile', accept=c('text/ascii')),

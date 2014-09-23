@@ -180,6 +180,11 @@ output$threatHist <- renderPlot({
   barplot(table(score))
   
 })
+output$ng_hist <- renderPlot({
+  ##
+  set.seed(123)
+  hist(degree.distribution(ng))
+})
     
     ## retweet network
     retweets(DF,input$edges) ## function from global
@@ -213,6 +218,7 @@ output$threatHist <- renderPlot({
           output$density <- renderText({graph.density(ng)})
           output$diameter <- renderText({diameter(ng)})
           output$clusters <- renderText({clusters(ng)$no})
+          output$clustercoeff <- renderText({transitivity(ng)})
         })
       })
       
@@ -226,6 +232,7 @@ output$threatHist <- renderPlot({
       output$m_density <- renderText({graph.density(m_ng)})
       output$m_diameter <- renderText({diameter(m_ng)})
       output$m_clusters <- renderText({clusters(m_ng)$no})
+      output$m_clustercoeff <- renderText({transitivity(m_ng)})
     })
     
     ## Frequent words ##
@@ -274,5 +281,17 @@ output$threatHist <- renderPlot({
       dd[, input$show_threatvars, drop = FALSE]
     })
     
+  datasetInput <- reactive({
+    switch(input$downloadGraphs,
+         "retweet network" = ng,
+         "mention network" = m_ng)
+})
+output$downloadData <- downloadHandler(
+  filename = 'test.graphml',
+  content = function(file) {
+    write.graph(datasetInput(), file, format <- 'graphml')
+  },
+  contentType = 'text/xml'
+)
   })
 })
