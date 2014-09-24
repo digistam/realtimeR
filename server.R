@@ -72,16 +72,33 @@ shinyServer(function(input, output, session) {
                       detail = "This may take a few moments...")
           Sys.sleep(1)
           setProgress(detail = "Still working...")
-          mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'|',DF$followers),FUN=table)
-          tbl <- as.data.frame(as.table(mn))
-          names(tbl) <- c('name','freq')
-          tbl_split <- data.frame(do.call('rbind', strsplit(as.character(tbl$name),'|',fixed=TRUE)))
-          tbl <- cbind(as.numeric(tbl$freq),tbl_split)
-          names(tbl) <- c('Frequency','Account','Followers')
-          tbl <- tbl[order(tbl$Frequency, decreasing = T),]
-          setProgress(detail = "Almost there...")
-          df <- tbl
-          
+#           mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'|',DF$followers),FUN=table)
+#           tbl <- as.data.frame(as.table(mn))
+#           names(tbl) <- c('name','freq')
+#           tbl_split <- data.frame(do.call('rbind', strsplit(as.character(tbl$name),'|',fixed=TRUE)))
+#           tbl <- cbind(as.numeric(tbl$freq),tbl_split)
+#           names(tbl) <- c('Frequency','Account','Followers')
+dg <- degree(ng)
+dg <- as.data.frame(as.table(dg))
+user <- as.data.frame(DF$username)
+names(dg) <- c('Username','Retweets')
+names(user) <- 'Username'
+#merge(user, dg, by = 'name')
+#user <- merge(user, dg, by = 'name',incomparables = NULL, all = TRUE)
+dd <- merge(user, dg, by = 'Username',incomparables = NULL, all.x = TRUE)
+dd[is.na(dd)] <- 0
+ddd <- cbind(dd,DF$followers)
+#aggregate(Username ~ DF$followers, ddd, function(x) length(unique(x)))
+#table(unlist(paste(ddd$Username,' | ',ddd[,3],' | ',ddd$Retweets[,3])))
+cc <- table(unlist(paste(ddd[,1],ddd[,3],ddd[,2])))
+cc <- as.data.frame(as.table(cc))
+dd <- data.frame(do.call('rbind', strsplit(as.character(cc$Var1),' ',fixed=TRUE)))
+tbl <- cbind(as.numeric(cc$Freq),dd)
+names(tbl) <- c('Frequency','Account','Followers','Retweets')
+tbl <- tbl[order(tbl$Frequency, decreasing = T),]
+setProgress(detail = "Almost there...")
+df <- tbl
+
         })})
     })
     ## hashtags ##
@@ -180,11 +197,6 @@ output$threatHist <- renderPlot({
   barplot(table(score))
   
 })
-output$ng_hist <- renderPlot({
-  ##
-  set.seed(123)
-  hist(degree.distribution(ng))
-})
     
     ## retweet network
     retweets(DF,input$edges) ## function from global
@@ -228,11 +240,22 @@ output$ng_hist <- renderPlot({
         isolate({
           m_retweets(DF,input$edges)
           vcount(m_ng)})})
+      #write.graph(m_ng,'.\\www\\mention.graphml',format <- 'graphml')
       output$m_edgeCount <- renderText({ecount(m_ng)})
       output$m_density <- renderText({graph.density(m_ng)})
       output$m_diameter <- renderText({diameter(m_ng)})
       output$m_clusters <- renderText({clusters(m_ng)$no})
       output$m_clustercoeff <- renderText({transitivity(m_ng)})
+      output$downloadRtGraph = downloadHandler(
+        filename = "retweetnetwork.graphml",
+        content = function(file) {
+          write.graph(ng, file, format <- 'graphml')
+        })
+      output$downloadMnGraph = downloadHandler(
+        filename = "mentionnetwork.graphml",
+        content = function(file) {
+          write.graph(ng, file, format <- 'graphml')
+        })
     })
     
     ## Frequent words ##
@@ -280,18 +303,7 @@ output$ng_hist <- renderPlot({
     })
       dd[, input$show_threatvars, drop = FALSE]
     })
-    
-  datasetInput <- reactive({
-    switch(input$downloadGraphs,
-         "retweet network" = ng,
-         "mention network" = m_ng)
-})
-output$downloadData <- downloadHandler(
-  filename = 'test.graphml',
-  content = function(file) {
-    write.graph(datasetInput(), file, format <- 'graphml')
-  },
-  contentType = 'text/xml'
-)
+
+  
   })
 })

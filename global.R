@@ -75,6 +75,7 @@ retweets <- function(y,z) {
   ng <- delete.vertices(g, bad.vs)
   V(ng)$size=degree(ng)*5
   V(ng)$color=degree(ng)+1
+  #V(ng)$label=V(ng)$name
   #V(ng)$label.cex <- degree(ng)*0.8
   #V(ng)$weight=degree(ng)
   ng <<- simplify(ng)

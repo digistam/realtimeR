@@ -80,14 +80,13 @@ shinyUI(
              htmlOutput('histfollow')
     ),
     tabPanel("Networks",
-             sidebarPanel(
-               selectInput("downloadGraphs", "Choose a Graph dataset:", 
-                           choices = c("retweet network", "mention network")),
-               downloadButton('downloadData', 'Download')
-             ),
-             mainPanel(
+              sidebarPanel(
+                downloadButton('downloadRtGraph', 'Download retweet network (Gephi)'),
+                p(),
+                downloadButton('downloadMnGraph', 'Download mention network (Gephi)')
+              ),
+              mainPanel(
                fluidRow (
-                 #plotOutput('RtGraph')
                  h1('Retweet network'),
                  p('Unique nodes in graph: '),
                  verbatimTextOutput("nodeCount"),
@@ -100,12 +99,11 @@ shinyUI(
                  p('Clustering coefficient'),
                  verbatimTextOutput("clustercoeff"),
                  p('Largest diameter: '),
-                 verbatimTextOutput("diameter")#,
-                 #p('Degree distribution'),
-                 #plotOutput("ng_hist")
+                 verbatimTextOutput("diameter")
+                 
                ),
                fluidRow (
-                 #plotOutput('RtGraph')
+                 
                  h1('Mention network'),
                  p('Unique nodes in graph: '),
                  verbatimTextOutput("m_nodeCount"),
@@ -121,8 +119,8 @@ shinyUI(
                  verbatimTextOutput("m_diameter"),
                  p('zorg voor mogelijkheid export graphml bestanden'),
                  p('case studies: http://www.danah.org/papers/TweetTweetRetweet.pdf, http://truthy.indiana.edu/site_media/pdfs/conover_icwsm2011_polarization.pdf, http://journalistsresource.org/studies/politics/campaign-media/us-government-twitter-research')
-               )
-             )
+                )
+            )
 
     ),
     tabPanel("Test",
