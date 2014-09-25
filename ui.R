@@ -51,6 +51,9 @@ shinyUI(
              verbatimTextOutput('sliderinfo')
     ),
     tabPanel("Influence",
+             conditionalPanel(condition = "!exists(ng)",
+                              p("Run network analysis first")
+             ),
              p('dataset: '),
              textOutput('Inf_myKeyword'),
              p(),

@@ -23,6 +23,8 @@ if (!require("wordcloud")) {
   library("wordcloud") 
 }
 
+as.numeric.factor <- function(x) {as.numeric(levels(x))[x]}
+
 DF <- data.frame(replicate(18,sample(0:1,20,rep=TRUE)))
 names(DF) <- c("id",         "tid",        "username",   "statuses",   "since",      "followers", 
                "friends",    "location",   "utc_offset", "created_at","content",    "geo",       

@@ -40,10 +40,10 @@ shinyServer(function(input, output, session) {
           tableName <<- input$database_tables
           output$Time_myKeyword <- renderPrint(tableName)
           output$Inf_myKeyword <- renderPrint(tableName)
-          output$Hist_myKeyword <- renderPrint(cat(tableName))
-          output$Rt_myKeyword <- renderPrint(cat(tableName))
-          output$Words_myKeyword <- renderPrint(cat(tableName))
-          isolate(cat(tableName))
+          output$Hist_myKeyword <- renderPrint(tableName)
+          output$Rt_myKeyword <- renderPrint(tableName)
+          output$Words_myKeyword <- renderPrint(tableName)
+          #isolate(cat(tableName))
         })        
       }) 
     }
@@ -60,46 +60,52 @@ shinyServer(function(input, output, session) {
         DF <<- DF
         DF
       })
-      rm(list = c("t2"))
+      #rm(list = c("t2"))
       DF[, input$show_vars, drop = FALSE]
     })
     
     output$influence <- renderDataTable({
-      input$goButton
-      isolate({
+      #input$goButton
+      #isolate({
         withProgress(session, {
           setProgress(message = "Calculating, please wait",
                       detail = "This may take a few moments...")
           Sys.sleep(1)
-          setProgress(detail = "Still working...")
+          retweets(DF,input$edges)
 #           mn <- tapply(paste(DF$username,DF$followers),INDEX = paste(DF$username,'|',DF$followers),FUN=table)
 #           tbl <- as.data.frame(as.table(mn))
 #           names(tbl) <- c('name','freq')
 #           tbl_split <- data.frame(do.call('rbind', strsplit(as.character(tbl$name),'|',fixed=TRUE)))
 #           tbl <- cbind(as.numeric(tbl$freq),tbl_split)
 #           names(tbl) <- c('Frequency','Account','Followers')
+
 dg <- degree(ng)
 dg <- as.data.frame(as.table(dg))
-user <- as.data.frame(DF$username)
-names(dg) <- c('Username','Retweets')
-names(user) <- 'Username'
+user <- as.data.frame(cbind(DF$username,as.integer(DF$followers)))
+names(dg) <- c('Username','Retweeted')
+names(user) <- c('Username','Followers')
 #merge(user, dg, by = 'name')
 #user <- merge(user, dg, by = 'name',incomparables = NULL, all = TRUE)
+setProgress(detail = "Still working...")
+Sys.sleep(1)
 dd <- merge(user, dg, by = 'Username',incomparables = NULL, all.x = TRUE)
 dd[is.na(dd)] <- 0
 ddd <- cbind(dd,DF$followers)
-#aggregate(Username ~ DF$followers, ddd, function(x) length(unique(x)))
-#table(unlist(paste(ddd$Username,' | ',ddd[,3],' | ',ddd$Retweets[,3])))
-cc <- table(unlist(paste(ddd[,1],ddd[,3],ddd[,2])))
+cc <- table(unlist(paste(ddd[,1],ddd[,2],ddd[,3])))
 cc <- as.data.frame(as.table(cc))
+setProgress(detail = "Still working...")
+Sys.sleep(1)
 dd <- data.frame(do.call('rbind', strsplit(as.character(cc$Var1),' ',fixed=TRUE)))
 tbl <- cbind(as.numeric(cc$Freq),dd)
-names(tbl) <- c('Frequency','Account','Followers','Retweets')
+names(tbl) <- c('Frequency','Account','Followers','Retweeted')
+tbl$Followers <- as.numeric.factor(tbl$Followers)
+#tbl$Followers <- as.numeric(tbl$Followers)
 tbl <- tbl[order(tbl$Frequency, decreasing = T),]
-setProgress(detail = "Almost there...")
+setProgress(detail = "Generating output...")
+Sys.sleep(1)
 df <- tbl
-
-        })})
+       # })
+})
     })
     ## hashtags ##
     output$hashtags <- renderDataTable({
