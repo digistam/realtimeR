@@ -51,9 +51,6 @@ shinyUI(
              verbatimTextOutput('sliderinfo')
     ),
     tabPanel("Influence",
-             conditionalPanel(condition = "!exists(ng)",
-                              p("Run network analysis first")
-             ),
              p('dataset: '),
              textOutput('Inf_myKeyword'),
              p(),
@@ -84,9 +81,17 @@ shinyUI(
     ),
     tabPanel("Networks",
               sidebarPanel(
-                downloadButton('downloadRtGraph', 'Download retweet network (Gephi)'),
+                HTML('<p><b>Information:</b></p>'),
+                HTML('<ul><li><a target=_blank href="http://www.danah.org/papers/TweetTweetRetweet.pdf">Tweet, Tweet, Retweet: Conversational Aspects of Retweeting on Twitter</a></li>'),
+                HTML('<li><a target=_blank href="http://truthy.indiana.edu/site_media/pdfs/conover_icwsm2011_polarization.pdf">Political Polarization on Twitter</a></li>'),
+                HTML('<li><a target=_blank href="http://journalistsresource.org/studies/politics/campaign-media/us-government-twitter-research">Twitter, politics and the public: Research roundup</a></li>'),
+                HTML('<li><a target=_blank href="http://www.qcri.com/app/media/1900">Secular vs. Islamist Polarization in Egypt on Twitter</a></li></ul>'),
+                
+                downloadButton('downloadRtGraph', 'Download retweet network (a.o. Gephi)'),
                 p(),
-                downloadButton('downloadMnGraph', 'Download mention network (Gephi)')
+                downloadButton('downloadMnGraph', 'Download mention network (a.o. Gephi)'),
+                p()
+                
               ),
               mainPanel(
                fluidRow (
@@ -120,9 +125,13 @@ shinyUI(
                  verbatimTextOutput("m_clustercoeff"),
                  p('Largest diameter: '),
                  verbatimTextOutput("m_diameter"),
-                 p('zorg voor mogelijkheid export graphml bestanden'),
-                 p('case studies: http://www.danah.org/papers/TweetTweetRetweet.pdf, http://truthy.indiana.edu/site_media/pdfs/conover_icwsm2011_polarization.pdf, http://journalistsresource.org/studies/politics/campaign-media/us-government-twitter-research')
-                )
+                 p('')
+#                  HTML('<p><b>Information:</b></p>'),
+#                  HTML('<ul><li><a target=_blank href="http://www.danah.org/papers/TweetTweetRetweet.pdf">Tweet, Tweet, Retweet: Conversational Aspects of Retweeting on Twitter</a></li>'),
+#                  HTML('<li><a target=_blank href="http://truthy.indiana.edu/site_media/pdfs/conover_icwsm2011_polarization.pdf">Political Polarization on Twitter</a></li>'),
+#                  HTML('<li><a target=_blank href="http://journalistsresource.org/studies/politics/campaign-media/us-government-twitter-research">Twitter, politics and the public: Research roundup</a></li>'),
+#                  HTML('<li><a target=_blank href="http://www.qcri.com/app/media/1900">Secular vs. Islamist Polarization in Egypt on Twitter</a></li></ul>')
+                 )
             )
 
     ),
