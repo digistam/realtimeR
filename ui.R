@@ -70,6 +70,7 @@ shinyUI(
              p('dataset: '),
              textOutput('Words_myKeyword'),
              p(),
+             HTML('Inspiration: <a href="https://etda.libraries.psu.edu/paper/21347/22336">Monitoring Human traficking</a>'),
              h1('Frequent words'),
              verbatimTextOutput('freqWords')
     ),
