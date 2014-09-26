@@ -103,12 +103,14 @@ dd <- data.frame(do.call('rbind', strsplit(as.character(cc$Var1),' ',fixed=TRUE)
 tbl <- cbind(as.numeric(cc$Freq),dd)
 names(tbl) <- c('Frequency','Account','Followers','Retweeted','Betweenness')
 tbl$Followers <- as.numeric.factor(tbl$Followers)
+tbl$Retweeted <- as.numeric.factor(tbl$Retweeted)
 tbl$Betweenness <- as.numeric.factor(tbl$Betweenness)
 #tbl$Followers <- as.numeric(tbl$Followers)
 tbl <- tbl[order(tbl$Frequency, decreasing = T),]
 setProgress(detail = "Generating output...")
 Sys.sleep(1)
 df <- tbl
+
        # })
 })
     })

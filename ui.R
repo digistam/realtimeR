@@ -37,19 +37,19 @@ shinyUI(
              textOutput('tables')
     ),
     
-    tabPanel("TimeSeries",
-             
-             p('dataset: '),
-             
-             textOutput('Time_myKeyword'),
-             
-             fluidRow(
-               htmlOutput('timeSeries')),
-             p(),
-             sliderInput('timeSlider', 'Period in hours', 12, min =1, max = 24, step = 1),
-             checkboxInput("useSlider", "Unlimited period", FALSE),
-             verbatimTextOutput('sliderinfo')
-    ),
+#     tabPanel("TimeSeries",
+#              
+#              p('dataset: '),
+#              
+#              textOutput('Time_myKeyword'),
+#              
+#              fluidRow(
+#                htmlOutput('timeSeries')),
+#              p(),
+#              sliderInput('timeSlider', 'Period in hours', 12, min =1, max = 24, step = 1),
+#              checkboxInput("useSlider", "Unlimited period", FALSE),
+#              verbatimTextOutput('sliderinfo')
+#     ),
     tabPanel("Influence",
              p('dataset: '),
              textOutput('Inf_myKeyword'),
@@ -74,23 +74,24 @@ shinyUI(
              h1('Frequent words'),
              verbatimTextOutput('freqWords')
     ),
-    tabPanel("Histogram",
-             p('dataset: '),
-             textOutput('Hist_myKeyword'),
-             p(),
-             htmlOutput('histfollow')
-    ),
-    tabPanel("Networks",
+#     tabPanel("Histogram",
+#              p('dataset: '),
+#              textOutput('Hist_myKeyword'),
+#              p(),
+#              htmlOutput('histfollow')
+#     ),
+    tabPanel("Network Graphs",
               sidebarPanel(
                 HTML('<p><b>Information:</b></p>'),
                 HTML('<ul><li><a target=_blank href="http://www.danah.org/papers/TweetTweetRetweet.pdf">Tweet, Tweet, Retweet: Conversational Aspects of Retweeting on Twitter</a></li>'),
                 HTML('<li><a target=_blank href="http://truthy.indiana.edu/site_media/pdfs/conover_icwsm2011_polarization.pdf">Political Polarization on Twitter</a></li>'),
                 HTML('<li><a target=_blank href="http://journalistsresource.org/studies/politics/campaign-media/us-government-twitter-research">Twitter, politics and the public: Research roundup</a></li>'),
-                HTML('<li><a target=_blank href="http://www.qcri.com/app/media/1900">Secular vs. Islamist Polarization in Egypt on Twitter</a></li></ul>'),
+                HTML('<li><a target=_blank href="http://www.qcri.com/app/media/1900">Secular vs. Islamist Polarization in Egypt on Twitter</a></li>'),
+                HTML('<li><a target=_blank href=http://www.youtube.com/watch?v=7LMnpM0p4cM>Gephi Modularity Tutorial</a></li></ul>'),
                 
-                downloadButton('downloadRtGraph', 'Download retweet network (a.o. Gephi)'),
+                downloadButton('downloadRtGraph', 'Download retweet network (Gephi)'),
                 p(),
-                downloadButton('downloadMnGraph', 'Download mention network (a.o. Gephi)'),
+                downloadButton('downloadMnGraph', 'Download mention network (Gephi)'),
                 p()
                 
               ),
@@ -136,7 +137,7 @@ shinyUI(
             )
 
     ),
-    tabPanel("Test",
+    tabPanel("List matching",
              fileInput('threatFile', 'Select textfile', accept=c('text/ascii')),
              #actionButton("threatButton", "Go!"),
              
