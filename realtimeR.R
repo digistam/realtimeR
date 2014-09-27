@@ -174,7 +174,7 @@ textmine <- function(y,z) {
   ## remove sparse terms to simplify the cluster plot
   ## Note: tweak the sparse parameter to determine the number of words.
   ## About 10-30 words is good.
-  DF.dtm2 <- removeSparseTerms(DF.dtm, sparse=0.95)
+  DF.dtm2 <- removeSparseTerms(DF.dtm, sparse=0.2)
   ## convert the sparse term-document matrix to a standard data frame
   DF.df <- as.data.frame(inspect(DF.dtm2))
   ## inspect dimensions of the data frame

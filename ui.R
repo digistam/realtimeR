@@ -142,7 +142,7 @@ shinyUI(
              #actionButton("threatButton", "Go!"),
              
              fluidRow (
-               h1('Threat scores'),
+               h1('Matches'),
                checkboxGroupInput('show_threatvars', '',
                                   names(DF), selected = names(c(DF[3],DF[10],DF[11])), inline = T),
                sliderInput('threat_scores', 'Dreigingsscore', 1, min = -5, max = 5, step = 1),

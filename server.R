@@ -17,6 +17,11 @@ if (!require("tm")) {
   install.packages("tm", repos="http://cran.rstudio.com/") 
   library("tm") 
 }
+library(SnowballC)
+if (!require("SnowballC")) {
+  install.packages("SnowballC", repos="http://cran.rstudio.com/") 
+  library("SnowballC") 
+}
 library(lubridate)
 if (!require("lubridate")) {
   install.packages("lubridate", repos="http://cran.rstudio.com/") 
@@ -124,13 +129,14 @@ df <- tbl
           Sys.sleep(1)
           setProgress(detail = "Still working...")
           #hashtags()
-          ht <- unlist(strsplit(tolower(str_trim(DF$hashtag)), ","))
-          ht <- str_replace_all(string=ht, pattern=" ", repl="")
-          ht <- tapply(ht,INDEX = ht,FUN=table)
-          ht <- as.data.frame(as.table(ht))
-          names(ht) <- c('hashtag','frequency')
-          setProgress(detail = "Almost there...")
-          ht[ order(-ht[2]), ] ## order by column number
+           ht <- unlist(strsplit(str_trim(DF$hashtag), ","))
+           ht <- str_replace_all(string=ht, pattern=" ", repl="")
+          #ht <- tapply(DF$hashtag,INDEX = DF$hashtag, FUN=table)
+           ht <- tapply(ht,INDEX = ht,FUN=table)
+           ht <- as.data.frame(as.table(ht))
+           names(ht) <- c('hashtag','frequency')
+           setProgress(detail = "Almost there...")
+           ht[ order(-ht[2]), ] ## order by column number
         })})
     })
     ##
@@ -285,7 +291,11 @@ output$threatHist <- renderPlot({
           DF.corpus <- tm_map(DF.corpus, removePunctuation)
           DF.stopwords <- c(stopwords('english'), stopwords('dutch'))
           DF.corpus <- tm_map(DF.corpus, removeWords, DF.stopwords)
-          DF.dtm <- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(2,10)))
+          ## Stemmer: run, runs, running becomes run
+          DF.corpus <- tm_map(DF.corpus, stemDocument)
+          DF.corpus <- tm_map(DF.corpus, stripWhitespace)
+          DF.dtm <<- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(2,10)))
+          DF.dtm = removeSparseTerms(DF.dtm, 0.99)
           freqTerms <- findFreqTerms(DF.dtm, lowfreq=10) 
           setProgress(detail = "Almost there...")
           freqTerms #<- as.data.frame(freqTerms)
