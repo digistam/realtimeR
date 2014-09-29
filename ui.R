@@ -40,9 +40,14 @@ shinyUI(
              p('dataset: '),
              textOutput('Words_myKeyword'),
              p(),
-             HTML('Inspiration: <a href="https://etda.libraries.psu.edu/paper/21347/22336">Monitoring Human traficking</a>'),
+             HTML('Inspiration: <a href="https://etda.libraries.psu.edu/paper/21347/22336">Monitoring Human trafficking</a>'),
              h1('Textmining'),
-             h2('Frequent terms'),             
+             h2('Frequent terms'),   
+             selectizeInput('freqTermsBox', 'select term:', choices = NULL),
+             actionButton("freqTermsButton", "Go!"),
+             fluidRow(
+               dataTableOutput(outputId="assocWords")
+             ),
              fluidRow(
                dataTableOutput(outputId="freqWords")
              )

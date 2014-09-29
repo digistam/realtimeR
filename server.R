@@ -289,7 +289,7 @@ output$threatHist <- renderPlot({
           ##
 #          content <- as.data.frame(DF$content)
 #          DF.corpus <- Corpus(DataframeSource(content,encoding="UTF-8"))
-          DF.corpus <- Corpus(VectorSource(DF$content, encoding = "UTF-8"))
+          DF.corpus <- Corpus(VectorSource(DF$content))
 #          corpustxt <- Corpus(DataframeSource(meinDataFrame, encoding = "UTF-8"), readerControl = list(language = "german")) 
 #          docterm = DocumentTermMatrix(corpustxt,control=list(encoding = "UTF-8"))
           DF.corpus <- tm_map(DF.corpus, removePunctuation)
@@ -300,13 +300,29 @@ output$threatHist <- renderPlot({
           DF.corpus <- tm_map(DF.corpus, stripWhitespace)
           DF.dtm <<- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(2,10), encoding = "UTF-8"))
           DF.dtm <- removeSparseTerms(DF.dtm, 0.99)
-          freqTerms <- findFreqTerms(DF.dtm, lowfreq=10) ## freqTerms aantal aanpassen met slider
+          freqTerms <<- findFreqTerms(DF.dtm, lowfreq=10) ## freqTerms aantal aanpassen met slider
           setProgress(detail = "Almost there...")
           as.data.frame(freqTerms)
         #})
         })
+        updateSelectizeInput(session, 'freqTermsBox', choices = freqTerms)
     })
     
+output$assocWords <- renderDataTable({
+  input$freqTermsButton
+  isolate({
+    withProgress(session, {
+      setProgress(message = "Calculating, please wait",
+                  detail = "This may take a few moments...")
+      Sys.sleep(1)
+      setProgress(detail = "Still working...")
+    term <<- input$freqTermsBox
+    assocsDF <<- findAssocs(DF.dtm, term, 0.20)
+    setProgress(detail = "Almost there...")
+    as.data.frame(as.table(assocsDF))
+  })
+  })
+})
     threatFile<-input$threatFile
     print(threatFile)
     if(is.null(threatFile))
@@ -332,6 +348,5 @@ output$threatHist <- renderPlot({
       dd[, input$show_threatvars, drop = FALSE]
     })
 
-  
   })
 })
