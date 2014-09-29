@@ -9,10 +9,11 @@ import sys
 
 # database interface
 import sqlite3
-conn = sqlite3.connect('__name_of_db.db')
+conn = sqlite3.connect('stream.db')
 conn.text_factory = str
 curs = conn.cursor()
-keyword = '__keyword__'
+keyword = 'politie'
+trackWords = ["brandweer","politie","leger"]
 
 table = "CREATE TABLE IF NOT EXISTS " + keyword + " (id INTEGER PRIMARY KEY AUTOINCREMENT, tid TEXT, username TEXT, \
         statuses TEXT, since TEXT, followers INTEGER, friends INTEGER, location TEXT, utc_offset INTEGER, \
@@ -120,7 +121,8 @@ def main():
         try:
             print "Establishing stream...",
             stream = tweepy.Stream(auth1, StreamWatcherHandler(), timeout=None)
-            stream.filter(track=[keyword])
+            #stream.filter(track=[keyword])
+            stream.filter(track=trackWords )
             print "Done"
         except:
             e = sys.exc_info()[0]
