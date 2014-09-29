@@ -5,6 +5,7 @@
 # twitter client
 import tweepy
 import twittercredentials
+import trackWords
 import sys
 
 # database interface
@@ -12,8 +13,9 @@ import sqlite3
 conn = sqlite3.connect('stream.db')
 conn.text_factory = str
 curs = conn.cursor()
-keyword = 'politie'
-trackWords = ["brandweer","politie","leger"]
+keyword = 'multiple_trackwords'
+#trackWords = ["brandweer","politie","leger"]
+trackWords = trackWords.LIST
 
 table = "CREATE TABLE IF NOT EXISTS " + keyword + " (id INTEGER PRIMARY KEY AUTOINCREMENT, tid TEXT, username TEXT, \
         statuses TEXT, since TEXT, followers INTEGER, friends INTEGER, location TEXT, utc_offset INTEGER, \
