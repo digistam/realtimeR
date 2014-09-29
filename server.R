@@ -1,4 +1,4 @@
-options(shiny.maxRequestSize=30*1024^2)
+options(shiny.maxRequestSize=100*1024^2)
 if (!require("shiny")) {
   install.packages("shiny", repos="http://cran.rstudio.com/") 
   library("shiny") 
@@ -278,28 +278,33 @@ output$threatHist <- renderPlot({
     })
     
     ## Frequent words ##
-    output$freqWords <- renderText({
-      input$goButton
-      isolate({
+    output$freqWords <- renderDataTable({
+      #input$goButton
+      #isolate({
         withProgress(session, {
           setProgress(message = "Calculating, please wait",
                       detail = "This may take a few moments...")
           Sys.sleep(1)
           setProgress(detail = "Still working...")
           ##
-          DF.corpus <- Corpus(VectorSource(DF$content))
+#          content <- as.data.frame(DF$content)
+#          DF.corpus <- Corpus(DataframeSource(content,encoding="UTF-8"))
+          DF.corpus <- Corpus(VectorSource(DF$content, encoding = "UTF-8"))
+#          corpustxt <- Corpus(DataframeSource(meinDataFrame, encoding = "UTF-8"), readerControl = list(language = "german")) 
+#          docterm = DocumentTermMatrix(corpustxt,control=list(encoding = "UTF-8"))
           DF.corpus <- tm_map(DF.corpus, removePunctuation)
           DF.stopwords <- c(stopwords('english'), stopwords('dutch'))
           DF.corpus <- tm_map(DF.corpus, removeWords, DF.stopwords)
           ## Stemmer: run, runs, running becomes run
           DF.corpus <- tm_map(DF.corpus, stemDocument)
           DF.corpus <- tm_map(DF.corpus, stripWhitespace)
-          DF.dtm <<- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(2,10)))
-          DF.dtm = removeSparseTerms(DF.dtm, 0.99)
-          freqTerms <- findFreqTerms(DF.dtm, lowfreq=10) 
+          DF.dtm <<- TermDocumentMatrix(DF.corpus,control = list(wordLengths = c(2,10), encoding = "UTF-8"))
+          DF.dtm <- removeSparseTerms(DF.dtm, 0.99)
+          freqTerms <- findFreqTerms(DF.dtm, lowfreq=10) ## freqTerms aantal aanpassen met slider
           setProgress(detail = "Almost there...")
-          freqTerms #<- as.data.frame(freqTerms)
-        })})
+          as.data.frame(freqTerms)
+        #})
+        })
     })
     
     threatFile<-input$threatFile

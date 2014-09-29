@@ -36,6 +36,17 @@ shinyUI(
              ),
              textOutput('tables')
     ),
+    tabPanel("Textmining",
+             p('dataset: '),
+             textOutput('Words_myKeyword'),
+             p(),
+             HTML('Inspiration: <a href="https://etda.libraries.psu.edu/paper/21347/22336">Monitoring Human traficking</a>'),
+             h1('Textmining'),
+             h2('Frequent terms'),             
+             fluidRow(
+               dataTableOutput(outputId="freqWords")
+             )
+    ),
     
 #     tabPanel("TimeSeries",
 #              
@@ -66,14 +77,6 @@ shinyUI(
              fluidRow(
                dataTableOutput(outputId="hashtags")
              )),
-    tabPanel("Words",
-             p('dataset: '),
-             textOutput('Words_myKeyword'),
-             p(),
-             HTML('Inspiration: <a href="https://etda.libraries.psu.edu/paper/21347/22336">Monitoring Human traficking</a>'),
-             h1('Frequent words'),
-             verbatimTextOutput('freqWords')
-    ),
 #     tabPanel("Histogram",
 #              p('dataset: '),
 #              textOutput('Hist_myKeyword'),
