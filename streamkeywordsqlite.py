@@ -25,7 +25,6 @@ curs.execute(table)
 class StreamWatcherHandler(tweepy.StreamListener):
     """ Handles all incoming tweets as discrete tweet objects.
     """
-
     
     def on_status(self, status):
         """Called when status (tweet) object received.
