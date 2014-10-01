@@ -300,6 +300,7 @@ output$powerLaw <- renderPlot({
                       detail = "This may take a few moments...")
           Sys.sleep(1)
           setProgress(detail = "Still working...")
+          if(!exists(freqTerms)) {
           ##
 #          content <- as.data.frame(DF$content)
 #          DF.corpus <- Corpus(DataframeSource(content,encoding="UTF-8"))
@@ -317,6 +318,8 @@ output$powerLaw <- renderPlot({
           freqTerms <<- findFreqTerms(DF.dtm, lowfreq=10) ## freqTerms aantal aanpassen met slider
           setProgress(detail = "Almost there...")
           as.data.frame(freqTerms)
+          }
+          else {as.data.frame(freqTerms)}
         #})
         })
         updateSelectizeInput(session, 'freqTermsBox', choices = freqTerms)
@@ -331,7 +334,7 @@ output$assocWords <- renderDataTable({
       Sys.sleep(1)
       setProgress(detail = "Still working...")
     term <<- input$freqTermsBox
-    assocsDF <<- findAssocs(DF.dtm, term, 0.20)
+    assocsDF <<- findAssocs(DF.dtm, term, 0.5)
     setProgress(detail = "Almost there...")
     as.data.frame(as.table(assocsDF))
   })
