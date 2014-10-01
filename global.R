@@ -52,6 +52,9 @@ subsetDF <- function(x) {
 }
 retweets <- function(y,z) {
   #require(igraph)
+  withProgress(session, {
+    setProgress(message = "Calculating, please wait", detail = "This may take a few moments...")
+    Sys.sleep(1)
   DF <- y
   # List the most influential accounts
   #print(head(paste(DF$username,DF$followers)[rev(order(DF$followers))],n <- 50))
@@ -69,17 +72,21 @@ retweets <- function(y,z) {
   #countRT.subset <- subset(countRT,countRT >2) # subset those RTd at least twice
   #barplot(countRT.subset,las=2,cex.names = 0.75) # plot them
   #  basic social network analysis using RT 
+  setProgress(detail = "Still working...")
+  Sys.sleep(1)
   rt <- data.frame(user=DF$username, rt=DF$rt) # tweeter-retweeted pairs
   rt.u <- na.omit(unique(rt)) # omit pairs with NA, get only unique pairs
   # begin sna
   g <- graph.data.frame(rt.u, directed = T)
   bad.vs <- V(g)[degree(g) < as.numeric(z)]
   ng <- delete.vertices(g, bad.vs)
+  setProgress(detail = "Creating output ...")
   V(ng)$size=degree(ng)*5
   V(ng)$color=degree(ng)+1
   #V(ng)$label=V(ng)$name
   #V(ng)$label.cex <- degree(ng)*0.8
   #V(ng)$weight=degree(ng)
+  Sys.sleep(1)
   ng <<- simplify(ng)
   #ecount(g) # edges (connections)
   #vcount(g) # vertices (nodes)
@@ -203,4 +210,40 @@ roundTimes <- function() {
   print('roundTimes wordt uitgevoerd')
   t2 <<- strptime(DF$created_at, format="%Y-%m-%d %H:%M:%s")
   t2$min <<- round(t2$min, -1)
+}
+plot_degree_distribution = function(graph) {
+  # calculate degree
+  d = degree(graph, mode = "all")
+  dd = degree.distribution(graph, mode = "all", cumulative = FALSE)
+  degree = 1:max(d)
+  probability = dd[-1]
+  # delete blank values
+  nonzero.position = which(probability != 0)
+  probability = probability[nonzero.position]
+  degree = degree[nonzero.position]
+  # plot
+  plot(probability ~ degree, log = "xy", xlab = "Degree (log)", ylab = "Probability (log)", 
+       col = 1, main = "Retweet Network")
+}
+fit_power_law = function(graph) {
+  # calculate degree
+  d = degree(graph, mode = "all")
+  dd = degree.distribution(graph, mode = "all", cumulative = FALSE)
+  degree = 1:max(d)
+  probability = dd[-1]
+  # delete blank values
+  nonzero.position = which(probability != 0)
+  probability = probability[nonzero.position]
+  degree = degree[nonzero.position]
+  reg = lm(log(probability) ~ log(degree))
+  cozf = coef(reg)
+  power.law.fit = function(x) exp(cozf[[1]] + cozf[[2]] * log(x))
+  alpha = -cozf[[2]]
+  R.square = summary(reg)$r.squared
+  print(paste("Alpha =", round(alpha, 3)))
+  print(paste("R square =", round(R.square, 3)))
+  # plot
+  plot(probability ~ degree, log = "xy", xlab = "Degree (log)", ylab = "Probability (log)", 
+       col = 1, main = "Degree Distribution")
+  curve(power.law.fit, col = "red", add = T, n = length(d))
 }

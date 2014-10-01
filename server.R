@@ -88,9 +88,12 @@ dg <- degree(ng)
 dg <- as.data.frame(as.table(dg))
 bt <- betweenness(ng)
 bt <- as.data.frame(as.table(bt))
+pr <- page.rank(ng)$vector
+pr <- as.data.frame(as.table(pr))
 user <- as.data.frame(cbind(DF$username,as.integer(DF$followers)))
 names(dg) <- c('Username','Retweeted')
 names(bt) <- c('Username','Betweenness')
+names(pr) <- c('Username','PageRank')
 names(user) <- c('Username','Followers')
 #merge(user, dg, by = 'name')
 #user <- merge(user, dg, by = 'name',incomparables = NULL, all = TRUE)
@@ -98,18 +101,20 @@ setProgress(detail = "Still working...")
 Sys.sleep(1)
 dd <- merge(user, dg, by = 'Username',incomparables = NULL, all.x = TRUE)
 dd <- merge(dd, bt, by = 'Username',incomparables = NULL, all.x = TRUE)
+dd <- merge(dd, pr, by = 'Username',incomparables = NULL, all.x = TRUE)
 dd[is.na(dd)] <- 0
 ddd <- cbind(dd,DF$followers)
-cc <- table(unlist(paste(ddd[,1],ddd[,2],ddd[,3],ddd[,4])))
+cc <- table(unlist(paste(ddd[,1],ddd[,2],ddd[,3],ddd[,5],ddd[,4])))
 cc <- as.data.frame(as.table(cc))
 setProgress(detail = "Still working...")
 Sys.sleep(1)
 dd <- data.frame(do.call('rbind', strsplit(as.character(cc$Var1),' ',fixed=TRUE)))
 tbl <- cbind(as.numeric(cc$Freq),dd)
-names(tbl) <- c('Frequency','Account','Followers','Retweeted','Betweenness')
+names(tbl) <- c('Frequency','Account','Followers','Retweeted','PageRank','Betweenness')
 tbl$Followers <- as.numeric.factor(tbl$Followers)
 tbl$Retweeted <- as.numeric.factor(tbl$Retweeted)
 tbl$Betweenness <- as.numeric.factor(tbl$Betweenness)
+tbl$PageRank <- as.numeric.factor(tbl$PageRank)
 #tbl$Followers <- as.numeric(tbl$Followers)
 tbl <- tbl[order(tbl$Frequency, decreasing = T),]
 setProgress(detail = "Generating output...")
@@ -276,6 +281,15 @@ output$threatHist <- renderPlot({
           write.graph(ng, file, format <- 'graphml')
         })
     })
+output$powerLaw <- renderPlot({
+  
+  ##
+  set.seed(123)
+  par(bg = "#f5f5f5")
+  plot_degree_distribution(ng)
+  #fit_power_law(ng)
+  
+})
     
     ## Frequent words ##
     output$freqWords <- renderDataTable({

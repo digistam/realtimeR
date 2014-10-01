@@ -10,11 +10,10 @@ import sys
 
 # database interface
 import sqlite3
-conn = sqlite3.connect('stream.db')
+conn = sqlite3.connect(trackWords.DATABASE)
 conn.text_factory = str
 curs = conn.cursor()
-keyword = 'multiple_trackwords'
-#trackWords = ["brandweer","politie","leger"]
+keyword = trackWords.KEYWORD
 trackWords = trackWords.LIST
 
 table = "CREATE TABLE IF NOT EXISTS " + keyword + " (id INTEGER PRIMARY KEY AUTOINCREMENT, tid TEXT, username TEXT, \

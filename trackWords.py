@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# © 2014, Mark Stam 
+# © 2014, Mark Stam
+DATABASE = "syria2.db"
+KEYWORD = "syria"
 LIST = [
-    "الطفل", #kind
-    "الهولندية" #nederlands
+    "Syria+Hollande", 
+    "Syria+Netherlands",
+    "Jihaad",
+    "Syria+Dutch",
+    "ISIS"
     ]
