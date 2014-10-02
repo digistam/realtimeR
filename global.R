@@ -52,9 +52,9 @@ subsetDF <- function(x) {
 }
 retweets <- function(y,z) {
   #require(igraph)
-  withProgress(session, {
-    setProgress(message = "Calculating, please wait", detail = "This may take a few moments...")
-    Sys.sleep(1)
+#   withProgress(session, {
+#     setProgress(message = "Calculating, please wait", detail = "This may take a few moments...")
+#     Sys.sleep(1)
   DF <- y
   # List the most influential accounts
   #print(head(paste(DF$username,DF$followers)[rev(order(DF$followers))],n <- 50))
@@ -72,8 +72,8 @@ retweets <- function(y,z) {
   #countRT.subset <- subset(countRT,countRT >2) # subset those RTd at least twice
   #barplot(countRT.subset,las=2,cex.names = 0.75) # plot them
   #  basic social network analysis using RT 
-  setProgress(detail = "Still working...")
-  Sys.sleep(1)
+#   setProgress(detail = "Still working...")
+#   Sys.sleep(1)
   rt <- data.frame(user=DF$username, rt=DF$rt) # tweeter-retweeted pairs
   rt.u <- na.omit(unique(rt)) # omit pairs with NA, get only unique pairs
   # begin sna
@@ -86,7 +86,7 @@ retweets <- function(y,z) {
   #V(ng)$label=V(ng)$name
   #V(ng)$label.cex <- degree(ng)*0.8
   #V(ng)$weight=degree(ng)
-  Sys.sleep(1)
+#   Sys.sleep(1)
   ng <<- simplify(ng)
   #ecount(g) # edges (connections)
   #vcount(g) # vertices (nodes)
