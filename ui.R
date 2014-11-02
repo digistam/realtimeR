@@ -30,7 +30,7 @@ shinyUI(
              
              fluidRow(
                checkboxGroupInput('show_vars', '',
-                                  names(DF), selected = names(c(DF[3],DF[10],DF[11])), inline = T),
+                                  names(DF), selected = names(c(DF[3],DF[4],DF[5],DF[12],DF[13])), inline = T),
                dataTableOutput("tweets"),
                tags$head(tags$style("tfoot {display: table-header-group;}"))
              ),

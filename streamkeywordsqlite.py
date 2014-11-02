@@ -17,8 +17,9 @@ keyword = trackWords.KEYWORD
 trackWords = trackWords.LIST
 
 table = "CREATE TABLE IF NOT EXISTS " + keyword + " (id INTEGER PRIMARY KEY AUTOINCREMENT, tid TEXT, username TEXT, \
-        statuses TEXT, since TEXT, followers INTEGER, friends INTEGER, location TEXT, utc_offset INTEGER, \
-        created_at DATETIME, content TEXT, geo TEXT, meta TEXT, hashtags TEXT, urls TEXT, media TEXT, source TEXT, lang TEXT)"
+        page TEXT, avatar TEXT, statuses TEXT, since TEXT, followers INTEGER, friends INTEGER, location TEXT, utc_offset INTEGER, \
+        created_at DATETIME, content TEXT, geo TEXT, meta TEXT, hashtags TEXT, urls TEXT, media TEXT, source TEXT, \
+        lang TEXT)"
 curs.execute(table)
 
 class StreamWatcherHandler(tweepy.StreamListener):
@@ -43,13 +44,16 @@ class StreamWatcherHandler(tweepy.StreamListener):
                return [item['text'].encode('utf-8').strip() for item in x]
 
             def urlparser(x):
-               return [str(item['expanded_url']).encode('utf-8').strip() for item in x]
+               return [str('<a target=_blank href=' + item['expanded_url'] + '>' + item['expanded_url'] + '</a>').encode('utf-8').strip() for item in x]
 
             def mediaparser(x):
-               return [str(item['media_url']).encode('utf-8').strip() for item in x]
+               return [str('<img src=' + item['media_url'] + '>').encode('utf-8').strip() for item in x]
 
             tid = status.id_str
             usr = status.author.screen_name.encode('utf-8').strip()
+            page = '<a target=_blank href=http://www.twitter.com/' + status.author.screen_name.encode('utf-8').strip() + '>Twitter profile</a>' 
+            avatar = '<img src=' + status.author.profile_image_url + '>'
+            
             try:
                 statuses = status.user.statuses_count
             except KeyError:
@@ -92,11 +96,11 @@ class StreamWatcherHandler(tweepy.StreamListener):
 
             # Now that we have our tweet information, let's stow it away in our 
             # sqlite database
-            curs.execute("insert into " + keyword + " (tid, username, \
+            curs.execute("insert into " + keyword + " (tid, username, page, avatar, \
                             statuses, since, followers, friends, location, utc_offset, \
                             created_at, content, geo, meta, hashtags, urls, media, source, lang) \
-                          values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",         \
-                          (tid, usr, statuses, since, followers, friends, location, utc_offset, \
+                          values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",         \
+                          (tid, usr, page, avatar, statuses, since, followers, friends, location, utc_offset, \
                            cat, txt, ', '.join(geo), meta, ', '.join(hasht), ', '.join(urls),\
                            ', '.join(media), src, lang))
             conn.commit()

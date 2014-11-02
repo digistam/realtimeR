@@ -25,11 +25,11 @@ if (!require("wordcloud")) {
 
 as.numeric.factor <- function(x) {as.numeric(levels(x))[x]}
 
-DF <- data.frame(replicate(18,sample(0:1,20,rep=TRUE)))
-names(DF) <- c("id",         "tid",        "username",   "statuses",   "since",      "followers", 
-               "friends",    "location",   "utc_offset", "created_at","content",    "geo",       
-               "meta",       "hashtags",   "urls",       "media",      "source",     "lang")  
-DF <- DF[ order(-rank(DF[10])), ]
+DF <- data.frame(replicate(20,sample(0:1,20,rep=TRUE)))
+names(DF) <- c("id",         "tid",        "username",   "page", "avatar", "statuses",   "since",      
+               "followers",  "friends",    "location",   "utc_offset", "created_at","content",    
+               "geo", "meta",       "hashtags",   "urls",       "media",      "source",     "lang")  
+DF <- DF[ order(-rank(DF[12])), ]
 #tempTt = scan('www/temp.txt',what='character', comment.char=';')
 words = c('temp')
 connectSQL <- function(x) {

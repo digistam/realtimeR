@@ -120,8 +120,6 @@ tbl <- tbl[order(tbl$Frequency, decreasing = T),]
 setProgress(detail = "Generating output...")
 Sys.sleep(1)
 df <- tbl
-
-       # })
 })
     })
     ## hashtags ##
