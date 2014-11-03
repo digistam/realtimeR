@@ -48,9 +48,9 @@ class StreamWatcherHandler(tweepy.StreamListener):
 
             def mediaparser(x):
                return [str('<img src=' + item['media_url'] + '>').encode('utf-8').strip() for item in x]
-
-            tid = status.id_str
+  
             usr = status.author.screen_name.encode('utf-8').strip()
+            tid = '<a target=_blank href=https://www.twitter.com/' + usr + '/status/' + status.id_str + '>' + status.id_str + '</a>'
             page = '<a target=_blank href=http://www.twitter.com/' + status.author.screen_name.encode('utf-8').strip() + '>Twitter profile</a>' 
             avatar = '<img src=' + status.author.profile_image_url + '>'
             

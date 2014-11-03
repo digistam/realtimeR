@@ -19,7 +19,6 @@ shinyUI(
                         ".shiny-output-error {visibility: hidden; }",
                         ".shiny-output-before {visibility: hidden; }",
                         ".jslider { max-width: 600px; }"),
-             p('To Do: woord associaties, sentiment analyse, graphml export, excel export'),
              fileInput('dbfile', 'load database file:'),
              #fileInput('threatFile', 'Select textfile', accept=c('text/ascii')),
 
@@ -156,7 +155,7 @@ shinyUI(
              fluidRow (
                h1('Matches'),
                checkboxGroupInput('show_threatvars', '',
-                                  names(DF), selected = names(c(DF[3],DF[10],DF[11])), inline = T),
+                                  names(DF), selected = names(c(DF[3],DF[4],DF[5],DF[12],DF[13])), inline = T),
                sliderInput('threat_scores', 'Dreigingsscore', 1, min = -5, max = 5, step = 1),
                dataTableOutput(outputId="threats"),
                plotOutput('threatHist')
