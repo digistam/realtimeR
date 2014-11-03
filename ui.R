@@ -15,6 +15,7 @@ shinyUI(
     "realtimeR 0.1", id="nav",
     
     tabPanel("Dataset",
+             tags$link(rel = 'stylesheet', type = 'text/css', href = 'styles.css'),
              tags$style(type="text/css",
                         ".shiny-output-error {visibility: hidden; }",
                         ".shiny-output-before {visibility: hidden; }",
@@ -36,6 +37,7 @@ shinyUI(
              textOutput('tables')
     ),
     tabPanel("Influencers",
+             tags$link(rel = 'stylesheet', type = 'text/css', href = 'styles.css'),
              p('dataset: '),
              textOutput('Inf_myKeyword'),
              p(),
@@ -45,6 +47,7 @@ shinyUI(
              textOutput('tables3')
     ),
     tabPanel("Network Graphs",
+             tags$link(rel = 'stylesheet', type = 'text/css', href = 'styles.css'),
              sidebarPanel(
                downloadButton('downloadRtGraph', 'Download retweet network (Gephi)'),
                p(),
@@ -104,6 +107,7 @@ shinyUI(
              
     ),
      tabPanel("Textmining",
+              tags$link(rel = 'stylesheet', type = 'text/css', href = 'styles.css'),
               p('dataset: '),
               textOutput('Words_myKeyword'),
               p(),
@@ -135,6 +139,7 @@ shinyUI(
 #     ),
 
     tabPanel("Hashtags",
+             tags$link(rel = 'stylesheet', type = 'text/css', href = 'styles.css'),
              p('dataset: '),
              #textOutput('Inf_myKeyword'),
              #        p(),
@@ -149,6 +154,7 @@ shinyUI(
 #     ),
 
     tabPanel("List matching",
+             tags$link(rel = 'stylesheet', type = 'text/css', href = 'styles.css'),
              fileInput('threatFile', 'Select textfile', accept=c('text/ascii')),
              #actionButton("threatButton", "Go!"),
              
@@ -162,6 +168,7 @@ shinyUI(
                )
              ),
     tabPanel("Credits",
+             tags$link(rel = 'stylesheet', type = 'text/css', href = 'styles.css'),
              p("Mark Stam"),
              HTML("<a target=_blank href=https://github.com/digistam/realtimeR>GitHub</a>"),
              # progressInit() must be called somewhere in the UI in order
