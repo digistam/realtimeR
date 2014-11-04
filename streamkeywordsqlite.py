@@ -79,6 +79,7 @@ class StreamWatcherHandler(tweepy.StreamListener):
             except KeyError:
                 utc_offset = ''
             txt = status.text.encode('utf-8').strip()
+            print txt
             cat = status.created_at
             if str(status.geo) != 'None':
                 geo = geoparser(status.geo['coordinates'])
