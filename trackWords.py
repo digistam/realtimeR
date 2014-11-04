@@ -4,9 +4,5 @@
 DATABASE = "syria2.db"
 KEYWORD = "syria"
 LIST = [
-    "Syria+Hollande", 
-    "Syria+Netherlands",
-    "Jihaad",
-    "Syria+Dutch",
-    "ISIS"
+"syria"
     ]
