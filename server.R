@@ -315,6 +315,7 @@ output$powerLaw <- renderPlot({
           DF.dtm <- removeSparseTerms(DF.dtm, 0.99)
           freqTerms <<- findFreqTerms(DF.dtm, lowfreq=10) ## freqTerms aantal aanpassen met slider
           setProgress(detail = "Almost there...")
+          names(freqTerms) <- c('Frequent word','Frequency','Score')
           as.data.frame(freqTerms)
 #           }
 #           else {as.data.frame(freqTerms)}

@@ -162,7 +162,7 @@ shinyUI(
                h1('Matches'),
                checkboxGroupInput('show_threatvars', '',
                                   names(DF), selected = names(c(DF[3],DF[4],DF[5],DF[12],DF[13])), inline = T),
-               sliderInput('threat_scores', 'Dreigingsscore', 1, min = -5, max = 5, step = 1),
+               sliderInput('threat_scores', 'score', 1, min = -5, max = 5, step = 1),
                dataTableOutput(outputId="threats"),
                plotOutput('threatHist')
                )
