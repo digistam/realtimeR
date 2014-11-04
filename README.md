@@ -21,16 +21,3 @@ You should keep these secret, if anybody else gets these keys your Twitter accou
 
 ## Variables
 Dataset variables (labels) are explained in [codeBook.md](https://github.com/digistam/realtimeR/blob/master/CodeBook.md).
-
-## How does it work
-After creation of the (large) dataset with the connectSQL() and queryTable() functions, it's wise to create a subset with the subsetDF() function.
-
-> subsetDF('Germany')
-
-Now a new dataset, named subDF, is available with all tweets from the large dataset containing the word 'Germany'. You can use the other functions on this subsetted dataset, like:
-
-> textmine(subDF,'Germany')
->
-> tweet.scores = score.sentiment(subDF$content, pos.words, neg.words, .progress='text')
-
-etc.
